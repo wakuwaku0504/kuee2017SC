@@ -50,7 +50,7 @@ class jintori(object):
             clock.tick(60) #60fps
             self.screen.blit(self.backImg,(0,0))
             self.update()
-            self.draw(self.screen)
+            self.draw( )
             pygame.display.update()
             self.key_handler()
             
@@ -190,119 +190,129 @@ class jintori(object):
         push_space_pos = ((SCR_RECT.width-push_space.get_width())/2, int(SCR_RECT.height/2))
         self.screen.blit(push_space, push_space_pos)
     
-    def draw(self, screen):
+    def draw_wait(self):
+        self.all.draw(self.screen)
+        m = int(self.limite / 60)
+        s = self.limite % 60
+        #時間描画
+        rest_font = pygame.font.SysFont(None, 80)
+        rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
+        rest_pos = (
+                (SCR_RECT.width-rest.get_width())/2,
+                (SCR_RECT.height-rest.get_height())/2)
+        self.screen.blit(rest, rest_pos)
+    
+    def draw_play(self):
+        self.all.draw(self.screen)
+        m = int(self.limite / 60)
+        s = self.limite % 60
+        #時間描画
+        rest_font = pygame.font.SysFont(None, 80)
+        if self.limite>10: #残り時間が10秒より残っていたら黒
+            rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
+        else:
+            rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (255,0,0))
+        rest_pos = (
+                (SCR_RECT.width-rest.get_width())/2,
+                (SCR_RECT.height-rest.get_height())/2)
+        self.screen.blit(rest, rest_pos)
+        self.loop += 1
+        if self.loop==60:
+            self.limite -= 1
+            self.loop = 0
+        if self.limite==0:
+            self.game_state = GAME_SET
+            pygame.mixer.music.fadeout(2*1000)
+            
+    def draw_game_set(self):
+        self.all.draw(self.screen)
+        m = 0
+        s = 0
+        #時間描画
+        rest_font = pygame.font.SysFont(None, 80)
+        rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (255,0,0))
+        rest_pos = (
+                (SCR_RECT.width-rest.get_width())/2,
+                (SCR_RECT.height-rest.get_height())/2)
+        self.screen.blit(rest, rest_pos)
+        self.loop += 1
+        if self.loop==120:
+            self.loop = 0
+            self.game_state = SCORE
+            
+    def draw_score(self):
+        self.all.draw(self.screen)   
+        SCORE_RECT = Rect(
+                int(SCR_RECT.width/7),
+                int(SCR_RECT.height/7),
+                int(SCR_RECT.width*5/7),
+                int(SCR_RECT.height*5/7)
+                )
+        #スコア背景
+        self.screen.fill((0,0,0), SCORE_RECT)
+        #スコアタイトル
+        s_t_font = pygame.font.SysFont(None, 80)
+        s_title = s_t_font.render("SCORE", False, (255,255,255))
+        s_title_pos = ((SCR_RECT.width-s_title.get_width())/2, int(SCR_RECT.height*2/8))
+        self.screen.blit(s_title, s_title_pos)
+        #スコア計算
+        score0, score1, score2 = calc_score(self.tiles0, self.tiles1, self.tiles2)
+        #スコア表示
+        score_font = pygame.font.SysFont(None, 90)
+        scores = score_font.render(
+                'Player1:{0} Player2:{1}'.format(score1, score2), False, (255,255,255))
+        scores_pos = ((SCR_RECT.width-scores.get_width())/2, int(SCR_RECT.height*3/8))
+        if self.accum>=60:
+            self.screen.blit(scores, scores_pos)
+        #勝者判定
+        winner_font = pygame.font.SysFont(None, 150)
+        if score1>score2:
+            winner = winner_font.render("Winner Player1!!", False, (255,255,255))
+        elif score1<score2:
+            winner = winner_font.render("Winner Player2!!", False, (255,255,255))
+        elif score1==score2:
+            winner = winner_font.render("Draw", False, (255,255,255))
+            self.extra = True
+        winner_pos = ((SCR_RECT.width-winner.get_width())/2, int(SCR_RECT.height/2))
+        if not self.extra:
+            self.score_bgm()
+        if self.accum>=120:
+            self.screen.blit(winner, winner_pos)
+            if self.extra:
+                self.extra_bgm()
+            if self.extra and self.accum>=255:
+                extra_font = pygame.font.SysFont(None, 160)
+                extra = extra_font.render("EXTRA!!", False, (255,255,255))
+                extra_pos = ((SCR_RECT.width-extra.get_width())/2, int(SCR_RECT.height*2/3))
+                self.screen.blit(extra, extra_pos)
+                if self.accum>=340:
+                    self.accum = 0
+                    self.limite = 20
+                    self.extra = False
+                    self.snd = 0
+                    self.snd_b = 0
+                    self.game_state = PLAY
+            else: 
+                if not self.extra and self.snd==0:    
+                    self.congratulations_sound.play() #一回だけ鳴らす
+                    self.snd = 1
+        
+        self.accum += 1
+        if self.accum>500:
+            self.accum = 500 #カンスト防ぎ用
+    
+    def draw(self):
         #描画
         if self.game_state==START:
             self.draw_title()
         elif self.game_state==WAIT:
-            self.all.draw(screen)
-            m = int(self.limite / 60)
-            s = self.limite % 60
-            #時間描画
-            rest_font = pygame.font.SysFont(None, 80)
-            rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
-            rest_pos = (
-                    (SCR_RECT.width-rest.get_width())/2,
-                    (SCR_RECT.height-rest.get_height())/2)
-            screen.blit(rest, rest_pos)
-        
+            self.draw_wait()
         elif self.game_state==PLAY:
-            self.all.draw(screen)
-            m = int(self.limite / 60)
-            s = self.limite % 60
-            #時間描画
-            rest_font = pygame.font.SysFont(None, 80)
-            if self.limite>10: #残り時間が10秒より残っていたら黒
-                rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
-            else:
-                rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (255,0,0))
-            rest_pos = (
-                    (SCR_RECT.width-rest.get_width())/2,
-                    (SCR_RECT.height-rest.get_height())/2)
-            screen.blit(rest, rest_pos)
-            self.loop += 1
-            if self.loop==60:
-                self.limite -= 1
-                self.loop = 0
-            if self.limite==0:
-                self.game_state = GAME_SET
-                pygame.mixer.music.fadeout(2*1000)
+            self.draw_play()
         elif self.game_state==GAME_SET:
-            self.all.draw(screen)
-            m = 0
-            s = 0
-            #時間描画
-            rest_font = pygame.font.SysFont(None, 80)
-            rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (255,0,0))
-            rest_pos = (
-                    (SCR_RECT.width-rest.get_width())/2,
-                    (SCR_RECT.height-rest.get_height())/2)
-            screen.blit(rest, rest_pos)
-            self.loop += 1
-            if self.loop==120:
-                self.loop = 0
-                self.game_state = SCORE
-        
+            self.draw_game_set()
         elif self.game_state==SCORE:
-            self.all.draw(screen)   
-            SCORE_RECT = Rect(
-                    int(SCR_RECT.width/7),
-                    int(SCR_RECT.height/7),
-                    int(SCR_RECT.width*5/7),
-                    int(SCR_RECT.height*5/7)
-                    )
-            #スコア背景
-            screen.fill((0,0,0), SCORE_RECT)
-            #スコアタイトル
-            s_t_font = pygame.font.SysFont(None, 80)
-            s_title = s_t_font.render("SCORE", False, (255,255,255))
-            s_title_pos = ((SCR_RECT.width-s_title.get_width())/2, int(SCR_RECT.height*2/8))
-            screen.blit(s_title, s_title_pos)
-            #スコア計算
-            score0, score1, score2 = calc_score(self.tiles0, self.tiles1, self.tiles2)
-            #スコア表示
-            score_font = pygame.font.SysFont(None, 90)
-            scores = score_font.render(
-                    'Player1:{0} Player2:{1}'.format(score1, score2), False, (255,255,255))
-            scores_pos = ((SCR_RECT.width-scores.get_width())/2, int(SCR_RECT.height*3/8))
-            if self.accum>=60:
-                screen.blit(scores, scores_pos)
-            #勝者判定
-            winner_font = pygame.font.SysFont(None, 150)
-            if score1>score2:
-                winner = winner_font.render("Winner Player1!!", False, (255,255,255))
-            elif score1<score2:
-                winner = winner_font.render("Winner Player2!!", False, (255,255,255))
-            elif score1==score2:
-                winner = winner_font.render("Draw", False, (255,255,255))
-                self.extra = True
-            winner_pos = ((SCR_RECT.width-winner.get_width())/2, int(SCR_RECT.height/2))
-            if not self.extra:
-                self.score_bgm()
-            if self.accum>=120:
-                screen.blit(winner, winner_pos)
-                if self.extra:
-                    self.extra_bgm()
-                if self.extra and self.accum>=255:
-                    extra_font = pygame.font.SysFont(None, 160)
-                    extra = extra_font.render("EXTRA!!", False, (255,255,255))
-                    extra_pos = ((SCR_RECT.width-extra.get_width())/2, int(SCR_RECT.height*2/3))
-                    screen.blit(extra, extra_pos)
-                    if self.accum>=340:
-                        self.accum = 0
-                        self.limite = 20
-                        self.extra = False
-                        self.snd = 0
-                        self.snd_b = 0
-                        self.game_state = PLAY
-                else: 
-                    if not self.extra and self.snd==0:    
-                        self.congratulations_sound.play() #一回だけ鳴らす
-                        self.snd = 1
-            
-            self.accum += 1
-            if self.accum>500:
-                self.accum = 500 #カンスト防ぎ用
+            self.draw_score()
     
     def key_handler(self):
         for event in pygame.event.get():
