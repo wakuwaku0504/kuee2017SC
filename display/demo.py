@@ -16,12 +16,13 @@ from teams import *
 START, WAIT, PLAY, GAME_SET, SCORE = (0, 1, 2, 3, 4) 
 
 DISPLAY = 1
-
+#bgmをかけるか
+BGM = 1
 #チーム設定
-P1 = nodoka
-P2 = saki
+P1 = saki
+P2 = shibuya_kun
 
-AUTO1 = 0 #1pをautoにするかどうか
+AUTO1 = 1 #1pをautoにするかどうか
 AUTO2 = 1
 
 class jintori(object):
@@ -55,22 +56,25 @@ class jintori(object):
             
     def bgm_play(self):
         #BGM再生
-        n = random.choice(range(1,10))
-        pygame.mixer.music.load("sound/bgm{}.mp3".format(n))
-        pygame.mixer.music.play(-1)
+        if BGM:
+            n = random.choice(range(1,12))
+            pygame.mixer.music.load("sound/bgm{}.mp3".format(n))
+            pygame.mixer.music.play(-1)
         
     def extra_bgm(self):
-        if self.snd_b==0:
-            pygame.mixer.music.load("sound/extra_bgm.mp3")
-            pygame.mixer.music.play(-1)
-            self.snd_b = 1
+        if BGM:
+            if self.snd_b==0:
+                pygame.mixer.music.load("sound/extra_bgm.mp3")
+                pygame.mixer.music.play(-1)
+                self.snd_b = 1
     
     def score_bgm(self):
-        if self.snd_b==0:
-            n = random.choice((1,2,3))
-            pygame.mixer.music.load("sound/score_loop{}.mp3".format(n))        
-            pygame.mixer.music.play(-1)
-            self.snd_b = 1
+        if BGM:
+            if self.snd_b==0:
+                n = random.choice((1,2,3))
+                pygame.mixer.music.load("sound/score_loop{}.mp3".format(n))        
+                pygame.mixer.music.play(-1)
+                self.snd_b = 1
             
     def init_game(self):
         #ゲームオブジェクト初期化
@@ -173,22 +177,23 @@ class jintori(object):
                 self.item_time += 1
                 if self.item_time==60*ITEM_TIME:
                     self.flag_item = True
-            
+    
+    def draw_title(self):
+        #タイトル描画
+        title_font = pygame.font.SysFont(None, 80)        
+        title = title_font.render("KUEE Summer Camp 2017", False, (255,0,0))
+        title_pos = ((SCR_RECT.width-title.get_width())/2,int(SCR_RECT.height/3))
+        self.screen.blit(title, title_pos)
+        #PUSH SPACEを描画
+        push_font = pygame.font.SysFont(None, 40)
+        push_space = push_font.render("PUSH SPACE KEY", False, (255,255,255))
+        push_space_pos = ((SCR_RECT.width-push_space.get_width())/2, int(SCR_RECT.height/2))
+        self.screen.blit(push_space, push_space_pos)
     
     def draw(self, screen):
         #描画
         if self.game_state==START:
-            #タイトル描画
-            title_font = pygame.font.SysFont(None, 80)        
-            title = title_font.render("KUEE Summer Camp 2017", False, (255,0,0))
-            title_pos = ((SCR_RECT.width-title.get_width())/2,int(SCR_RECT.height/3))
-            screen.blit(title, title_pos)
-            #PUSH SPACEを描画
-            push_font = pygame.font.SysFont(None, 40)
-            push_space = push_font.render("PUSH SPACE KEY", False, (255,255,255))
-            push_space_pos = ((SCR_RECT.width-push_space.get_width())/2, int(SCR_RECT.height/2))
-            screen.blit(push_space, push_space_pos)
-        
+            self.draw_title()
         elif self.game_state==WAIT:
             self.all.draw(screen)
             m = int(self.limite / 60)
