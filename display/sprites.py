@@ -10,15 +10,19 @@ import sys
 import random
 from tools import *
 
-SCR_RECT = Rect(0, 0, 1920, 1080)
+SCR_RECT = Rect(0, 0, 1280, 720)#(640,480),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
 TILE_H = int(SCR_RECT.bottom / 10)
-LIFE_TIME = 8 #second サポートキャラの寿命
+SPEED = int(1*TILE_W/60) #playerspeed
+RELOAD = 17
+SUPP_LIFE = 8 #second サポートキャラの寿命
+SUPP_SPEED = int(3*TILE_W/60)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
+SHOT_SPEED = int(3*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 2 #minute 制限時間 整数
-SP_POINT = 270 #ゲージがたまるタイル塗り数
+SP_POINT = 100 #ゲージがたまるタイル塗り数
 
 class Tile(pygame.sprite.Sprite):
     #色塗りタイルクラス
@@ -43,8 +47,8 @@ class Tile(pygame.sprite.Sprite):
 
 class Player(pygame.sprite.Sprite):
     #自機
-    speed = 2
-    reload_time = 17
+    speed = SPEED
+    reload_time = RELOAD
     change_time = 5 #second 方向変わるタイミング
     def __init__(self, flag, auto=False):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -215,6 +219,7 @@ class Player(pygame.sprite.Sprite):
     #スペシャル攻撃
     def special(self):
         #サポートを3つ生み出す
+        self.special_sound.play()
         for i in range(3):
             Support(self.rect.centerx, self.rect.centery, self.flag)
         #ゲージリセット
@@ -275,7 +280,7 @@ class Player(pygame.sprite.Sprite):
 
 class Shot(pygame.sprite.Sprite):
     #発射する液体クラス
-    speed = 6 #移動速度
+    speed = SHOT_SPEED #移動速度
     life = SHOT_LIFE #second 寿命 
     def __init__(self, pos, direct, flag):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -345,7 +350,8 @@ class Item(pygame.sprite.Sprite):
 class Support(pygame.sprite.Sprite):
     #サポートキャラ
     #x,yは中心座標
-    speed = 5
+    speed = SUPP_SPEED
+    life = 60*SUPP_LIFE
     def __init__(self, x, y, flag):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.flag = flag #１か２
@@ -360,7 +366,6 @@ class Support(pygame.sprite.Sprite):
         self.vy = random.choice((-self.speed, self.speed))
         #self.vx = random.choice(range(-2*self.speed,2*self.speed+1))
         #self.vy = random.choice(range(-2*self.speed,2*self.speed+1))
-        self.life = 60*LIFE_TIME #寿命
         #self.tiles01 = tuple(self.tiles0) + tuple(self.tiles1)
         #self.tiles02 = tuple(self.tiles0) + tuple(self.tiles2)
     

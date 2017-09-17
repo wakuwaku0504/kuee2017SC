@@ -15,7 +15,7 @@ from teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE = (0, 1, 2, 3, 4) 
 
-DISPLAY = 1
+FULL = 0
 #bgmをかけるか
 BGM = 1
 #チーム設定
@@ -31,10 +31,10 @@ class jintori(object):
         self.stick2 = joystick(2)
         pygame.init()
         pygame.mixer.init()
-        if DISPLAY:
+        if FULL:
             self.screen = pygame.display.set_mode((0,0), FULLSCREEN)
         else:
-            self.screen = pygame.display.set_mode((0,0))
+            self.screen = pygame.display.set_mode((SCR_RECT.width,SCR_RECT.height))
         pygame.display.set_caption("Demo")
     
         #イメージを用意
@@ -76,20 +76,14 @@ class jintori(object):
                 pygame.mixer.music.play(-1)
                 self.snd_b = 1
             
-    def init_game(self):
-        #ゲームオブジェクト初期化
+    #ゲーム内のフラグ、数値初期化
+    def init_flags(self):
         #ゲーム状態
         self.game_state = START
         #ゲーム残り時間
         self.limite = 60*LIMITE
+        #６０周するとたつ
         self.loop = 0
-        #タイル配置用
-        SCR_CX = SCR_RECT.centerx
-        SCR_CY = SCR_RECT.centery
-        self.tile_rangex1 = range(SCR_CX+2*TILE_W, SCR_RECT.right-TILE_W, TILE_W) #真ん中から右
-        self.tile_rangex2 = range(SCR_CX-2*TILE_W, TILE_W, -TILE_W)      #真ん中から左
-        self.tile_rangey1 = range(SCR_CY, SCR_RECT.bottom-TILE_H, TILE_H)#真ん中から下
-        self.tile_rangey2 = range(SCR_CY-TILE_H, TILE_H, -TILE_H)      #真ん中から上
         #アイテム発生用
         self.flag_item = True
         self.item_time = ITEM_TIME
@@ -97,9 +91,44 @@ class jintori(object):
         self.accum = 0
         #スコア発表用
         self.snd = 0
+        #bgm一回だけ鳴らすため
         self.snd_b = 0
         #extra突入フラグ
         self.extra = False
+        #タイル配置用
+        self.SCR_CX = SCR_RECT.centerx
+        self.SCR_CY = SCR_RECT.centery
+        self.tile_rangex1 = range(self.SCR_CX+2*TILE_W, SCR_RECT.right-TILE_W, TILE_W) #真ん中から右
+        self.tile_rangex2 = range(self.SCR_CX-2*TILE_W, TILE_W, -TILE_W)      #真ん中から左
+        self.tile_rangey1 = range(self.SCR_CY, SCR_RECT.bottom-TILE_H, TILE_H)#真ん中から下
+        self.tile_rangey2 = range(self.SCR_CY-TILE_H, TILE_H, -TILE_H)      #真ん中から上
+    
+    def init_tiles(self):
+        #タイルを作成
+        for i in self.tile_rangex1:
+            for j in self.tile_rangey1:
+                Tile(i,j)
+            for j in self.tile_rangey2:
+                Tile(i,j)
+        
+        for i in self.tile_rangex2:
+            for j in self.tile_rangey1:
+                Tile(i,j)
+            for j in self.tile_rangey2:
+                Tile(i,j)
+        
+        for i in range(self.SCR_CX-TILE_W, self.SCR_CX+2*TILE_W, TILE_W):
+            for j in range(self.SCR_CY+TILE_H, SCR_RECT.bottom-TILE_H, TILE_H):
+                Tile(i,j)
+                
+        for i in range(self.SCR_CX-TILE_W, self.SCR_CX+2*TILE_W, TILE_W):
+            for j in range(self.SCR_CY-TILE_H, TILE_H, -TILE_H):
+                Tile(i,j) 
+    
+    def init_game(self):
+        #ゲームオブジェクト初期化
+        self.init_flags()
+        
         #スプライトグループを作成して登録
         self.all = pygame.sprite.RenderUpdates()
         self.players = pygame.sprite.Group()
@@ -131,26 +160,7 @@ class jintori(object):
         Support.tiles1 = self.tiles1
         Support.tiles2 = self.tiles2
         
-        #タイルを作成
-        for i in self.tile_rangex1:
-            for j in self.tile_rangey1:
-                Tile(i,j)
-            for j in self.tile_rangey2:
-                Tile(i,j)
-        
-        for i in self.tile_rangex2:
-            for j in self.tile_rangey1:
-                Tile(i,j)
-            for j in self.tile_rangey2:
-                Tile(i,j)
-        
-        for i in range(SCR_CX-TILE_W, SCR_CX+2*TILE_W, TILE_W):
-            for j in range(SCR_CY+TILE_H, SCR_RECT.bottom-TILE_H, TILE_H):
-                Tile(i,j)
-                
-        for i in range(SCR_CX-TILE_W, SCR_CX+2*TILE_W, TILE_W):
-            for j in range(SCR_CY-TILE_H, TILE_H, -TILE_H):
-                Tile(i,j) 
+        self.init_tiles()
         
         #自機を作成
         Player(1, auto=AUTO1)
@@ -354,6 +364,7 @@ class jintori(object):
     def load_snd(self):
         #効果音ロード
         Player.gauge_sound = pygame.mixer.Sound("sound/gauge2.wav")
+        Player.special_sound = pygame.mixer.Sound("sound/special.wav")
         Tile.hit_sound = pygame.mixer.Sound("sound/hit3.wav")
         Item.generate_sound = pygame.mixer.Sound("sound/generate.wav")
         Item.born_sound = pygame.mixer.Sound("sound/item.wav")

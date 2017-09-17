@@ -20,13 +20,9 @@ def joystick(flag):
         stick.init() # init instance
         print('Joystickの名称: ' + stick.get_name())
         print('ボタン数 : ' + str(stick.get_numbuttons()))
-        fl = 1
+        return stick
     except pygame.error:
         print('Joystickが見つかりませんでした。')
-        fl = 0
-    if fl:
-        return stick
-    else:
         return False
 
 def resize(image, w, h):
