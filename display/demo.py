@@ -13,13 +13,13 @@ from tools import *
 from sprites import *
 from teams import *
 
-START, WAIT, PLAY, GAME_SET, SCORE = (0, 1, 2, 3, 4) 
+START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
 FULL = 0
 #bgmをかけるか
 BGM = 1
 #チーム設定
-P1 = saki
+P1 = jobs
 P2 = shibuya_kun
 
 AUTO1 = 1 #1pをautoにするかどうか
@@ -200,6 +200,10 @@ class jintori(object):
         push_space_pos = ((SCR_RECT.width-push_space.get_width())/2, int(SCR_RECT.height/2))
         self.screen.blit(push_space, push_space_pos)
     
+    def draw_config(self):
+        #コンフィグ画面
+        pass
+    
     def draw_wait(self):
         self.all.draw(self.screen)
         m = int(self.limite / 60)
@@ -315,6 +319,8 @@ class jintori(object):
         #描画
         if self.game_state==START:
             self.draw_title()
+        elif self.game_state==CONFIG:
+            self.draw_config()
         elif self.game_state==WAIT:
             self.draw_wait()
         elif self.game_state==PLAY:
@@ -332,6 +338,13 @@ class jintori(object):
             elif event.type==KEYDOWN and event.key==K_ESCAPE:
                 pygame.quit()
                 sys.exit()
+
+            elif event.type==KEYDOWN and event.key==K_c:
+                if self.game_state==START:
+                    self.game_state = CONFIG
+                elif self.game_state==CONFIG:
+                    self.game_state = START
+            
             elif event.type==KEYDOWN and event.key==K_SPACE:
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
@@ -364,7 +377,7 @@ class jintori(object):
     def load_snd(self):
         #効果音ロード
         Player.gauge_sound = pygame.mixer.Sound("sound/gauge2.wav")
-        Player.special_sound = pygame.mixer.Sound("sound/special.wav")
+        Player.special_sound = pygame.mixer.Sound("sound/special2.wav")
         Tile.hit_sound = pygame.mixer.Sound("sound/hit3.wav")
         Item.generate_sound = pygame.mixer.Sound("sound/generate.wav")
         Item.born_sound = pygame.mixer.Sound("sound/item.wav")

@@ -24,6 +24,72 @@ SHOT_SPEED = int(3*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 2 #minute 制限時間 整数
 SP_POINT = 100 #ゲージがたまるタイル塗り数
 
+#スプライトではないが
+class Card(object):
+    def __init__(self, thumb1, thumb2, screen, teams):
+        self.thumb1 = thumb1
+        self.thumb2 = thumb2
+        self.thumb1.active = 1
+        for thumb in [self.thumb1,self.thumb2]:
+            thumb.screen = screen
+            thumb.teams = teams
+            thumb.last = len(teams) - 1
+            thumb.image = teams[0]
+            thumb.rect = thumb.image.get_rect()
+        self.thumb1.rect.center = (int(SCR_RECT.width*1/3),SCR_RECT.centery)
+        self.thumb2.rect.center = (int(SCR_RECT.width*2/3),SCR_RECT.centery)
+        
+        
+    def update(self):
+        pk = pygame.key.get_pressed()
+        if pk[K_LEFT] or pk[K_RIGHT]:
+            self.thumb1.active *= -1
+            self.thumb2.active *= -1
+        self.thumb1.update()
+        self.thumb2.update()
+    
+    def draw(self):
+        self.thumb2.draw()
+        self.thumb1.draw()
+        
+    def players(self, teams_list):
+        p1 = self.thumb1.head
+        p2 = self.thumb2.head
+        return teams_list[p1], teams_list[p2]
+
+
+class Thumbnail(pygame.sprite.Sprite):
+    #対戦者を選ぶための画像保持
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        #リストのどこを見ているかのインデックス
+        self.head = 0
+        #操作されてるかどうか
+        self.active = -1  #-1or1
+        
+    def next_team(self):
+        #active時
+        if self.active==1:
+            pk = pygame.key.get_pressed()
+            if pk[K_UP]:
+                    self.head += 1
+            elif pk[K_DOWN]:
+                    self.head -= 1
+            #インデックスはみ出してないか
+            if self.head>self.last:
+                    self.head = 0
+            elif self.head<0:
+                    self.head = self.last
+    
+        
+    def update(self):
+        self.next_team()
+        self.image = self.teams[self.head]
+        
+    def draw(self):
+        self.screen.blit(self.image, self.rect)
+
+
 class Tile(pygame.sprite.Sprite):
     #色塗りタイルクラス
     #３種類のタイルを保持
