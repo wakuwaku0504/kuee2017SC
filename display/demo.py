@@ -31,6 +31,9 @@ class jintori(object):
     def __init__(self):
         self.stick1 = joystick(1) #joystick instance
         self.stick2 = joystick(2)
+        #player割り当て
+        self.P1 = P1
+        self.P2 = P2
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -85,6 +88,9 @@ class jintori(object):
                 pygame.mixer.music.play(-1)
                 self.snd_b = 1
             
+    def reflect_config(self):
+        self.P1, self.P2 = self.card.players()
+    
     #ゲーム内のフラグ、数値初期化
     def init_flags(self):
         #ゲーム状態
@@ -357,6 +363,9 @@ class jintori(object):
                     self.config_bgm()
                     self.game_state = CONFIG
                 elif self.game_state==CONFIG:
+                    
+                    self.load_img()
+                    self.init_game()
                     self.game_state = START
                     pygame.mixer.music.fadeout(1000)
             
@@ -379,16 +388,16 @@ class jintori(object):
         self.backImg = pygame.image.load("image/bg_veg.jpg").convert()
         #スプライトの画像を登録
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
-        Tile.image1 = load_image(P1.tile, TILE_W, TILE_H)
-        Tile.image2 = load_image(P2.tile, TILE_W, TILE_H)
-        Player.image1 = load_image(P1.image, TILE_W*2, TILE_H*2)
-        Player.image2 = load_image(P2.image, TILE_W*2, TILE_H*2)
-        Player.sp_image1 = load_image(P1.sp_image, TILE_W*2, TILE_H*2)
-        Player.sp_image2 = load_image(P2.sp_image, TILE_W*2, TILE_H*2)
+        Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
+        Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H)
+        Player.image1 = load_image(self.P1.image, TILE_W*2, TILE_H*2)
+        Player.image2 = load_image(self.P2.image, TILE_W*2, TILE_H*2)
+        Player.sp_image1 = load_image(self.P1.sp_image, TILE_W*2, TILE_H*2)
+        Player.sp_image2 = load_image(self.P2.sp_image, TILE_W*2, TILE_H*2)
         Shot.image = load_image("image/shot2.jpg", int(TILE_W/2), int(TILE_H/2), colorkey=-1)
         Item.image = load_image("image/box.png", TILE_W, TILE_H,colorkey=-1)
-        Support.image1 = load_image(P1.support, TILE_W, TILE_H)
-        Support.image2 = load_image(P2.support, TILE_W, TILE_H)
+        Support.image1 = load_image(self.P1.support, TILE_W, TILE_H)
+        Support.image2 = load_image(self.P2.support, TILE_W, TILE_H)
         
     def load_snd(self):
         #効果音ロード
