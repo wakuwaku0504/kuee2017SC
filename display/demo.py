@@ -22,6 +22,8 @@ BGM = 1
 P1 = jobs
 P2 = shibuya_kun
 
+TEAMS = [jobs, gates, saki, nodoka, aphex, shibuya_kun]
+
 AUTO1 = 1 #1pをautoにするかどうか
 AUTO2 = 1
 
@@ -38,6 +40,8 @@ class jintori(object):
         pygame.display.set_caption("Demo")
     
         #イメージを用意
+        #サムネ
+        self.teams_thumb = [load_image(m.image, 3*TILE_W, 3*TILE_H) for m in TEAMS]
         self.load_img()
         #サウンドを用意
         self.load_snd()
@@ -59,6 +63,11 @@ class jintori(object):
         if BGM:
             n = random.choice(range(1,12))
             pygame.mixer.music.load("sound/bgm{}.mp3".format(n))
+            pygame.mixer.music.play(-1)
+        
+    def config_bgm(self):
+        if BGM:
+            pygame.mixer.music.load("sound/config_bgm.mp3")
             pygame.mixer.music.play(-1)
         
     def extra_bgm(self):
@@ -128,6 +137,7 @@ class jintori(object):
     def init_game(self):
         #ゲームオブジェクト初期化
         self.init_flags()
+        self.card = Card(Thumbnail(), Thumbnail(),self.screen, self.teams_thumb)
         
         #スプライトグループを作成して登録
         self.all = pygame.sprite.RenderUpdates()
@@ -171,7 +181,9 @@ class jintori(object):
     
     def update(self):
         #ゲーム状態の更新
-        if self.game_state==PLAY:
+        if self.game_state==CONFIG:
+            self.card.update()
+        elif self.game_state==PLAY:
             #スプライトを更新
             self.all.update()
             #衝突判定
@@ -202,7 +214,7 @@ class jintori(object):
     
     def draw_config(self):
         #コンフィグ画面
-        pass
+        self.card.draw()
     
     def draw_wait(self):
         self.all.draw(self.screen)
@@ -341,9 +353,11 @@ class jintori(object):
 
             elif event.type==KEYDOWN and event.key==K_c:
                 if self.game_state==START:
+                    self.config_bgm()
                     self.game_state = CONFIG
                 elif self.game_state==CONFIG:
                     self.game_state = START
+                    pygame.mixer.music.fadeout(1000)
             
             elif event.type==KEYDOWN and event.key==K_SPACE:
                 if self.game_state==START: #スタート画面でスペースを押したとき
