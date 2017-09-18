@@ -38,16 +38,21 @@ class Card(object):
             thumb.rect = thumb.image.get_rect()
         self.thumb1.rect.center = (int(SCR_RECT.width*1/3),SCR_RECT.centery)
         self.thumb2.rect.center = (int(SCR_RECT.width*2/3),SCR_RECT.centery)
-        
+        #0になるまで反応しない
+        self.hold = 0
         
     def update(self):
         pk = pygame.key.get_pressed()
-        if pk[K_LEFT] or pk[K_RIGHT]:
+        if (pk[K_LEFT] or pk[K_RIGHT]) and self.hold==0:
             self.thumb1.active *= -1
             self.thumb2.active *= -1
+            self.hold = 10
         self.thumb1.update()
         self.thumb2.update()
-    
+        self.hold -= 1
+        if self.hold<0:
+            self.hold = 0
+        
     def draw(self):
         self.thumb2.draw()
         self.thumb1.draw()
@@ -66,28 +71,36 @@ class Thumbnail(pygame.sprite.Sprite):
         self.head = 0
         #操作されてるかどうか
         self.active = -1  #-1or1
+        #ボタン押されても、0になるまで反応しない
+        self.hold = 0 #frame
         
     def next_team(self):
         #active時
         if self.active==1:
             pk = pygame.key.get_pressed()
-            if pk[K_UP]:
-                    self.head += 1
-            elif pk[K_DOWN]:
-                    self.head -= 1
-            #インデックスはみ出してないか
-            if self.head>self.last:
-                    self.head = 0
-            elif self.head<0:
-                    self.head = self.last
-    
+            if self.hold==0:
+                if pk[K_UP]:
+                        self.head += 1
+                elif pk[K_DOWN]:
+                        self.head -= 1
+                #インデックスはみ出してないか
+                if self.head>self.last:
+                        self.head = 0
+                elif self.head<0:
+                        self.head = self.last
+                self.hold = 5
         
     def update(self):
         self.next_team()
         self.image = self.teams[self.head]
+        self.hold -= 1
+        if self.hold<0:
+            self.hold = 0
         
     def draw(self):
         self.screen.blit(self.image, self.rect)
+        if self.active==1:
+            pygame.draw.rect(self.screen, (255,255,255),self.rect, 2)
 
 
 class Tile(pygame.sprite.Sprite):
