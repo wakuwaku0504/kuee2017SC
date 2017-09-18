@@ -183,6 +183,7 @@ class jintori(object):
         #ゲーム状態の更新
         if self.game_state==CONFIG:
             self.card.update()
+            self.P1, self.P2 = self.card.players(TEAMS)
         elif self.game_state==PLAY:
             #スプライトを更新
             self.all.update()
@@ -371,7 +372,8 @@ class jintori(object):
                 elif self.game_state==GAME_SET:
                     self.game_state = SCORE
                 
-                        
+        
+   
     def load_img(self):
         #背景イメージのロード
         self.backImg = pygame.image.load("image/bg_veg.jpg").convert()

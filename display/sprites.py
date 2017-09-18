@@ -8,6 +8,7 @@ import pygame
 from pygame.locals import *
 import sys
 import random
+import math
 from tools import *
 
 SCR_RECT = Rect(0, 0, 1280, 720)#(640,480),(1920,1080)
@@ -30,6 +31,7 @@ class Card(object):
         self.thumb1 = thumb1
         self.thumb2 = thumb2
         self.thumb1.active = 1
+        #self.thumb2.theta = 90
         for thumb in [self.thumb1,self.thumb2]:
             thumb.screen = screen
             thumb.teams = teams
@@ -73,7 +75,16 @@ class Thumbnail(pygame.sprite.Sprite):
         self.active = -1  #-1or1
         #ボタン押されても、0になるまで反応しない
         self.hold = 0 #frame
+        #速度
+        self.vy = 0
+        #最大速度
+        self.vy_max = int(TILE_H/15)
+        #周波数
+        self.freq = 2
+        #角度
+        self.theta = 0
         
+    
     def next_team(self):
         #active時
         if self.active==1:
@@ -89,13 +100,20 @@ class Thumbnail(pygame.sprite.Sprite):
                 elif self.head<0:
                         self.head = self.last
                 self.hold = 5
+       
         
     def update(self):
+        self.theta += self.freq
+        self.vy = int(math.cos(math.radians(self.theta))*self.vy_max)
+        self.rect.move_ip(0,self.vy)
+        if int(self.theta)==360:
+            self.theta = 0
         self.next_team()
         self.image = self.teams[self.head]
         self.hold -= 1
         if self.hold<0:
             self.hold = 0
+        
         
     def draw(self):
         self.screen.blit(self.image, self.rect)
