@@ -15,7 +15,7 @@ from teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
-FULL = 0
+FULL = 1
 #bgmをかけるか
 BGM = 1
 #チーム設定
@@ -37,7 +37,7 @@ class jintori(object):
         pygame.init()
         pygame.mixer.init()
         if FULL:
-            self.screen = pygame.display.set_mode((0,0), FULLSCREEN)
+            self.screen = pygame.display.set_mode((SCR_RECT.width,SCR_RECT.height), FULLSCREEN)
         else:
             self.screen = pygame.display.set_mode((SCR_RECT.width,SCR_RECT.height))
         pygame.display.set_caption("Demo")
@@ -363,7 +363,6 @@ class jintori(object):
                     self.config_bgm()
                     self.game_state = CONFIG
                 elif self.game_state==CONFIG:
-                    
                     self.load_img()
                     self.init_game()
                     self.game_state = START
@@ -373,6 +372,8 @@ class jintori(object):
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
+                    #self.count_sound.play()
+                    #pygame.time.delay(1890)
                     self.game_state = PLAY
                     self.bgm_play()
                 elif self.game_state==PLAY:
@@ -387,6 +388,7 @@ class jintori(object):
         #背景イメージのロード
         self.backImg = pygame.image.load("image/bg_veg.jpg").convert()
         #スプライトの画像を登録
+        Thumbnail.icon = load_image("image/serval.png",TILE_W, TILE_H, colorkey=-1)
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
         Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
         Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H)
@@ -408,6 +410,7 @@ class jintori(object):
         Item.born_sound = pygame.mixer.Sound("sound/item.wav")
         Support.vanish_sound  = pygame.mixer.Sound("sound/vanish.wav")
         
+        #self.count_sound = pygame.mixer.Sound("sound/count.wav")
         self.congratulations_sound = pygame.mixer.Sound("sound/congratulations!.wav")
         self.extra_sound = pygame.mixer.Sound("sound/extra!!.wav")
         

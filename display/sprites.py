@@ -11,7 +11,7 @@ import random
 import math
 from tools import *
 
-SCR_RECT = Rect(0, 0, 1280, 720)#(640,480),(1920,1080)
+SCR_RECT = Rect(0, 0, 1280, 720)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
 TILE_H = int(SCR_RECT.bottom / 10)
@@ -83,6 +83,7 @@ class Thumbnail(pygame.sprite.Sprite):
         self.freq = 2
         #角度
         self.theta = 0
+        self.icon_rect = self.icon.get_rect()
         
     
     def next_team(self):
@@ -99,7 +100,7 @@ class Thumbnail(pygame.sprite.Sprite):
                         self.head = 0
                 elif self.head<0:
                         self.head = self.last
-                self.hold = 5
+                self.hold = 6
        
         
     def update(self):
@@ -110,6 +111,9 @@ class Thumbnail(pygame.sprite.Sprite):
             self.theta = 0
         self.next_team()
         self.image = self.teams[self.head]
+        self.icon_rect.bottom = self.rect.top
+        self.icon_rect.centerx = self.rect.centerx 
+        
         self.hold -= 1
         if self.hold<0:
             self.hold = 0
@@ -119,6 +123,7 @@ class Thumbnail(pygame.sprite.Sprite):
         self.screen.blit(self.image, self.rect)
         if self.active==1:
             pygame.draw.rect(self.screen, (255,255,255),self.rect, 2)
+            self.screen.blit(self.icon, self.icon_rect)
 
 
 class Tile(pygame.sprite.Sprite):
