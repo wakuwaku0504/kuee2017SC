@@ -84,6 +84,7 @@ class Thumbnail(pygame.sprite.Sprite):
         #角度
         self.theta = 0
         self.icon_rect = self.icon.get_rect()
+            
         
     
     def next_team(self):
@@ -123,7 +124,40 @@ class Thumbnail(pygame.sprite.Sprite):
         self.screen.blit(self.image, self.rect)
         if self.active==1:
             pygame.draw.rect(self.screen, (255,255,255),self.rect, 2)
-            self.screen.blit(self.icon, self.icon_rect)
+            #self.screen.blit(self.icon, self.icon_rect)
+
+class Bgm(pygame.sprite.Sprite):
+        def __init__(self, BGM):
+            pygame.sprite.Sprite.__init__(self)
+            self.BGM = BGM
+            self.delay = 0
+            self.rect = self.image.get_rect()
+            self.rect1 = self.image1.get_rect()
+            self.rect.centerx = int(SCR_RECT.width*7/8)
+            self.rect.centery = int(SCR_RECT.height*7/8)
+            self.rect1.bottom = self.rect.top
+            self.rect1.centerx = self.rect.centerx
+        
+        def update(self):
+            if self.delay==0:
+                pk = pygame.key.get_pressed()
+                if pk[K_b]:
+                    if self.BGM:
+                        self.BGM = 0
+                    else:
+                        self.BGM = 1
+                self.delay = 6
+            self.delay -= 1
+            if self.delay<0:
+                self.delay = 0
+        
+        def draw(self):
+            self.screen.blit(self.image, self.rect)
+            if self.BGM:
+                self.screen.blit(self.image1, self.rect1)
+            
+            
+    
 
 
 class Tile(pygame.sprite.Sprite):

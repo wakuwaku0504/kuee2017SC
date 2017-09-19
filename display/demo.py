@@ -16,8 +16,6 @@ from teams import *
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
 FULL = 1
-#bgmをかけるか
-BGM = 1
 #チーム設定
 P1 = jobs
 P2 = shibuya_kun
@@ -34,6 +32,7 @@ class jintori(object):
         #player割り当て
         self.P1 = P1
         self.P2 = P2
+        self.BGM = 1
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -63,25 +62,25 @@ class jintori(object):
             
     def bgm_play(self):
         #BGM再生
-        if BGM:
+        if self.BGM:
             n = random.choice(range(1,12))
             pygame.mixer.music.load("sound/bgm{}.mp3".format(n))
             pygame.mixer.music.play(-1)
         
     def config_bgm(self):
-        if BGM:
+        if self.BGM:
             pygame.mixer.music.load("sound/config_bgm.mp3")
             pygame.mixer.music.play(-1)
         
     def extra_bgm(self):
-        if BGM:
+        if self.BGM:
             if self.snd_b==0:
                 pygame.mixer.music.load("sound/extra_bgm.mp3")
                 pygame.mixer.music.play(-1)
                 self.snd_b = 1
     
     def score_bgm(self):
-        if BGM:
+        if self.BGM:
             if self.snd_b==0:
                 n = random.choice((1,2,3))
                 pygame.mixer.music.load("sound/score_loop{}.mp3".format(n))        
@@ -144,6 +143,7 @@ class jintori(object):
         #ゲームオブジェクト初期化
         self.init_flags()
         self.card = Card(Thumbnail(), Thumbnail(),self.screen, self.teams_thumb)
+        self.bgm = Bgm(self.BGM) 
         
         #スプライトグループを作成して登録
         self.all = pygame.sprite.RenderUpdates()
@@ -160,6 +160,8 @@ class jintori(object):
         Tile.containers = self.all, self.tiles0
         Item.containers = self.all, self.supports
         Support.containers = self.all, self.supports
+        
+        Bgm.screen = self.screen
         
         Player.screen = self.screen
         Player.tiles1 = self.tiles1
@@ -189,7 +191,9 @@ class jintori(object):
         #ゲーム状態の更新
         if self.game_state==CONFIG:
             self.card.update()
+            self.bgm.update()
             self.P1, self.P2 = self.card.players(TEAMS)
+            self.BGM = self.bgm.BGM
         elif self.game_state==PLAY:
             #スプライトを更新
             self.all.update()
@@ -222,6 +226,7 @@ class jintori(object):
     def draw_config(self):
         #コンフィグ画面
         self.card.draw()
+        self.bgm.draw()
     
     def draw_wait(self):
         self.all.draw(self.screen)
@@ -388,6 +393,8 @@ class jintori(object):
         #背景イメージのロード
         self.backImg = pygame.image.load("image/bg_veg.jpg").convert()
         #スプライトの画像を登録
+        Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
+        Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)
         Thumbnail.icon = load_image("image/serval.png",TILE_W, TILE_H, colorkey=-1)
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
         Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
