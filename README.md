@@ -4,8 +4,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* Quick summary
-	2017年度京都大学電気電子工学科サマーキャンプ用プログラム
+* 2017年度京都大学電気電子工学科サマーキャンプ用プログラム
 	魚眼カメラ二つを用いてARマーカーの空間座標を計算するクラスと
 	それを反映させる陣取りゲームのプログラムを保管
 * Version
