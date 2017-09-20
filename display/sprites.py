@@ -135,10 +135,21 @@ class Bgm(pygame.sprite.Sprite):
             self.rect1 = self.image1.get_rect()
             self.rect.centerx = int(SCR_RECT.width*7/8)
             self.rect.centery = int(SCR_RECT.height*7/8)
-            self.rect1.bottom = self.rect.top
+            self.rect1.bottom = self.rect.top - int(SCR_RECT.height/18)
             self.rect1.centerx = self.rect.centerx
+            self.g = 0.4
+            self.time = 0
+            self.v_init = -4
         
         def update(self):
+            #jump
+            self.v = int(self.v_init + self.time*self.g)
+            self.rect.move_ip(0,self.v)
+            self.time += 1
+            if self.v==-self.v_init:
+                self.time = 0
+            
+            
             if self.delay==0:
                 pk = pygame.key.get_pressed()
                 if pk[K_b]:
