@@ -4,8 +4,9 @@ Created on Tue Aug 29 15:34:39 2017
 
 @author: TE058
 """
-import cv2
+import cv2.aruco as aruco
 import numpy as np
+import cv2
 
 # 0 <= h <= 179 (色相)　OpenCVではmax=179なのでR:0(180),G:60,B:120となる
 # 0 <= s <= 255 (彩度)　黒や白の値が抽出されるときはこの閾値を大きくする
@@ -35,11 +36,12 @@ def ext_red(image):
     img_color = cv2.bitwise_and(image, image, mask=img_mask)
     
     return img_color 
-    
+
 if __name__=='__main__':
-    cap = cv2.VideoCapture(0)
-    if cap.isOpened() is False:
-        raise("IO Error") 
+    cap = cv2.VideoCapture(1)
+    if not cap.isOpened():
+        raise IOError
+    dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
     
     while(1):
  
@@ -47,10 +49,21 @@ if __name__=='__main__':
         ret, frame = cap.read()
         if not ret:
             continue
-            
-        img_color = ext_red(frame)
+
+        #img_show(marker)
+
+        camera_mat = np.loadtxt('K.csv', delimiter=',')
+        dist_coef = np.loadtxt('d.csv', delimiter=',')
+        print("K = \n", camera_mat)
+        print("d = ", dist_coef.ravel())
+        undistort_image = cv2.undistort(frame, camera_mat, dist_coef)
+
+        corners, ids, rejectedImgPoints = aruco.detectMarkers(undistort_image, dictionary)
+        print(corners, ids)
+        
+        image = aruco.drawDetectedMarkers(undistort_image, corners, ids)
  
-        cv2.imshow("SHOW COLOR IMAGE", img_color)
+        cv2.imshow("SHOW DETECTED MARKER", image)
  
         # qを押したら終了
         k = cv2.waitKey(1)

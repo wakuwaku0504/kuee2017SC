@@ -2,7 +2,7 @@ import cv2
 
 capture = cv2.VideoCapture(0)
 
-if capture.isOpened() is False:
+if capture.isOpened(1) is False:
     raise("IO Error")
 
 

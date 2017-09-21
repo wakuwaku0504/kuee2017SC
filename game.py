@@ -9,9 +9,9 @@ import sys
 import cv2
 import random
 from pygame.locals import *
-from tools import *
-from sprites import *
-from teams import *
+from display import tools
+from display.sprites import *
+from display.teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
@@ -32,7 +32,7 @@ class jintori(object):
         #player割り当て
         self.P1 = P1
         self.P2 = P2
-        self.BGM = 1
+        self.BGM = 0
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -377,8 +377,8 @@ class jintori(object):
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
-                    self.count_sound.play()
-                    pygame.time.delay(1230)
+                    #self.count_sound.play()
+                    #pygame.time.delay(1890)
                     self.game_state = PLAY
                     self.bgm_play()
                 elif self.game_state==PLAY:
@@ -416,7 +416,7 @@ class jintori(object):
         Item.born_sound = pygame.mixer.Sound("sound/item.wav")
         Support.vanish_sound  = pygame.mixer.Sound("sound/vanish.wav")
         
-        self.count_sound = pygame.mixer.Sound("sound/count.wav")
+        #self.count_sound = pygame.mixer.Sound("sound/count.wav")
         self.congratulations_sound = pygame.mixer.Sound("sound/congratulations!.wav")
         self.extra_sound = pygame.mixer.Sound("sound/extra!!.wav")
         
