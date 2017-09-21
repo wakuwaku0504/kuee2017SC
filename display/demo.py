@@ -18,9 +18,9 @@ START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5)
 FULL = 1
 #チーム設定
 P1 = jobs
-P2 = shibuya_kun
+P2 = gates
 
-TEAMS = [jobs, gates, saki, nodoka, aphex, shibuya_kun]
+TEAMS = [jobs, gates]
 
 AUTO1 = 1 #1pをautoにするかどうか
 AUTO2 = 1
@@ -32,7 +32,7 @@ class jintori(object):
         #player割り当て
         self.P1 = P1
         self.P2 = P2
-        self.BGM = 1
+        self.BGM = 0
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -63,7 +63,7 @@ class jintori(object):
     def bgm_play(self):
         #BGM再生
         if self.BGM:
-            n = random.choice(range(1,12))
+            n = random.choice(range(1,10))
             pygame.mixer.music.load("sound/bgm{}.mp3".format(n))
             pygame.mixer.music.play(-1)
         
@@ -305,9 +305,9 @@ class jintori(object):
         #勝者判定
         winner_font = pygame.font.SysFont(None, 150)
         if score1>score2:
-            winner = winner_font.render("Winner Player1!!", False, (255,255,255))
+            winner = winner_font.render("Player1!!", False, (255,255,255))
         elif score1<score2:
-            winner = winner_font.render("Winner Player2!!", False, (255,255,255))
+            winner = winner_font.render("Player2!!", False, (255,255,255))
         elif score1==score2:
             winner = winner_font.render("Draw", False, (255,255,255))
             self.extra = True
@@ -395,7 +395,6 @@ class jintori(object):
         #スプライトの画像を登録
         Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
         Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)
-        Thumbnail.icon = load_image("image/serval.png",TILE_W, TILE_H, colorkey=-1)
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
         Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
         Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H)

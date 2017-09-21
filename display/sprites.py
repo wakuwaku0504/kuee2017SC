@@ -11,7 +11,7 @@ import random
 import math
 from tools import *
 
-SCR_RECT = Rect(0, 0, 1280, 720)#(1280,720),(1920,1080)
+SCR_RECT = Rect(0, 0, 1024, 768)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
 TILE_H = int(SCR_RECT.bottom / 10)
@@ -83,7 +83,7 @@ class Thumbnail(pygame.sprite.Sprite):
         self.freq = 2
         #角度
         self.theta = 0
-        self.icon_rect = self.icon.get_rect()
+        
             
         
     
@@ -112,8 +112,6 @@ class Thumbnail(pygame.sprite.Sprite):
             self.theta = 0
         self.next_team()
         self.image = self.teams[self.head]
-        self.icon_rect.bottom = self.rect.top
-        self.icon_rect.centerx = self.rect.centerx 
         
         self.hold -= 1
         if self.hold<0:
@@ -124,7 +122,7 @@ class Thumbnail(pygame.sprite.Sprite):
         self.screen.blit(self.image, self.rect)
         if self.active==1:
             pygame.draw.rect(self.screen, (255,255,255),self.rect, 2)
-            #self.screen.blit(self.icon, self.icon_rect)
+
 
 class Bgm(pygame.sprite.Sprite):
         def __init__(self, BGM):
@@ -381,14 +379,14 @@ class Player(pygame.sprite.Sprite):
         #ゲージ
         if self.gauge>SP_POINT:
             self.gauge = SP_POINT
-        width = int((SCR_RECT.width*5/12)*self.gauge/SP_POINT)
-        height = int(TILE_H/2)
+        height = int((SCR_RECT.height*10/12)*self.gauge/SP_POINT)
+        width = int(TILE_W/2)
         pos = Rect(SCR_RECT.x, SCR_RECT.y, width, height)
         pos.bottom = int(SCR_RECT.bottom*14/15)
         if self.flag==1:
-            pos.left = int(SCR_RECT.width/13)
+            pos.left = int(SCR_RECT.width/30)
         elif self.flag==2:
-            pos.right = int(SCR_RECT.width*12/13)
+            pos.right = int(SCR_RECT.width*29/30)
         
         if self.gauge==SP_POINT:
             pygame.draw.rect(self.screen, (255,0,0), pos)
