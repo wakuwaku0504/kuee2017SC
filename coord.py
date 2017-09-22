@@ -32,8 +32,10 @@ class Coordinates(object):
         ret, frame = self.cap.read()
         if not ret:
             return False
+        
+        undistort_image = cv2.undistort(frame, self.K, self.d)
         #print(frame.shape)
-        corners, ids, _ = aruco.detectMarkers(frame, self.dictionary)
+        corners, ids, _ = aruco.detectMarkers(undistort_image, self.dictionary)
         if ids is None:
             return False
         
@@ -49,11 +51,11 @@ class Coordinates(object):
         if not ret:
             return False
         
-        corners, ids, _ = aruco.detectMarkers(frame, self.dictionary)
+        undistort_image = cv2.undistort(frame, self.K, self.d)
+        
+        corners, ids, _ = aruco.detectMarkers(undistort_image, self.dictionary)
         if ids is None:
             return False
-        
-        undistort_image = cv2.undistort(frame, self.K, self.d)
         
         image = aruco.drawDetectedMarkers(undistort_image, corners, ids)
         
@@ -67,7 +69,7 @@ class Coordinates(object):
     
     
 if __name__=="__main__":
-    coo = Coordinates(player_id=0,camera_id=1)
+    coo = Coordinates(player_id=0,camera_id=0)
     
     while(1):
         coo.image()
