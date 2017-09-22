@@ -22,7 +22,7 @@ SUPP_LIFE = 8 #second サポートキャラの寿命
 SUPP_SPEED = int(3*TILE_W/60)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
-SHOT_SPEED = int(3*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
+SHOT_SPEED = int(2*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 2 #minute 制限時間 整数
 SP_POINT = 100 #ゲージがたまるタイル塗り数
 
@@ -195,6 +195,7 @@ class Player(pygame.sprite.Sprite):
     #自機
     speed = SPEED
     reload_time = RELOAD
+    supply_time = 30 #second弾補給まで
     change_time = 5 #second 方向変わるタイミング
     def __init__(self, flag, player_id, camera_id, auto=False):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -217,6 +218,7 @@ class Player(pygame.sprite.Sprite):
         self.vx = random.choice((-self.speed,self.speed))
         self.vy = random.choice((-self.speed,self.speed))
         self.reload_timer = 10
+        self.supply_timer = self.supply_time*30
         self.my_tile = 0
         self.gauge = 0
         self.sp_flag = 0 #ゲージたまったらフラグが立つ
@@ -263,19 +265,27 @@ class Player(pygame.sprite.Sprite):
         
     def auto_mode_shot(self):
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_1] and self.flag==1:
-            if self.sp_flag:
-                self.special()
-        elif pressed_keys[K_2] and self.flag==2:
-            if self.sp_flag:
-                self.special()
-            
-        if self.reload_timer>0:
-            pass
-        else:
-            direction = random.choice(("up","down", "left", "right"))
-            Shot(self.rect.center, direction, self.flag)        
-            self.reload_timer = self.reload_time
+        if  self.supply_timer>0:
+            if pressed_keys[K_1] and self.flag==1:
+                if self.sp_flag:
+                    self.special()
+            elif pressed_keys[K_2] and self.flag==2:
+                if self.sp_flag:
+                    self.special()
+                
+            if self.reload_timer>0:
+                pass
+            else:
+                direction = random.choice(("up","down", "left", "right"))
+                Shot(self.rect.center, direction, self.flag)        
+                self.reload_timer = self.reload_time
+        
+        elif self.supply_timer<=0:
+            if pressed_keys[K_F1] and self.flag==1:
+                self.supply_timer = 30*self.supply_time
+            elif pressed_keys[K_F2] and self.flag==2:
+                self.supply_timer = 30*self.supply_time
+        self.supply_timer -= 1
         
     def stick_mode_move(self):
         #special

@@ -67,7 +67,7 @@ class Coordinates(object):
     
     
 if __name__=="__main__":
-    coo = Coordinates(player_id=0,camera_id=2)
+    coo = Coordinates(player_id=0,camera_id=1)
     
     while(1):
         coo.image()
