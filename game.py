@@ -9,21 +9,23 @@ import sys
 import cv2
 import random
 from pygame.locals import *
-from display import tools
-from display.sprites import *
-from display.teams import *
+from tools import *
+from sprites import *
+from teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
-
+FPS = 30
 FULL = 1
 #チーム設定
 P1 = jobs
 P2 = gates
 
-TEAMS = [jobs, gates, saki, nodoka, aphex]
+ID1 = 0 #1pのid
+ID2 = 1 #2pのid
+CAM1 = 0
+CAM2 = 2
+TEAMS = [jobs, gates]
 
-AUTO1 = 1 #1pをautoにするかどうか
-AUTO2 = 1
 
 class jintori(object):
     def __init__(self):
@@ -53,7 +55,7 @@ class jintori(object):
         clock = pygame.time.Clock()
 
         while(1):
-            clock.tick(60) #60fps
+            clock.tick(FPS) #40fps
             self.screen.blit(self.backImg,(0,0))
             self.update()
             self.draw( )
@@ -96,7 +98,7 @@ class jintori(object):
         self.game_state = START
         #ゲーム残り時間
         self.limite = 60*LIMITE
-        #６０周するとたつ
+        #4０周するとたつ
         self.loop = 0
         #アイテム発生用
         self.flag_item = True
@@ -181,10 +183,10 @@ class jintori(object):
         self.init_tiles()
         
         #自機を作成
-        Player(1, auto=AUTO1)
+        Player(1,player_id=ID1,camera_id=CAM1)
         #Player(1, 1)
         #敵機を作成
-        Player(2, auto=AUTO2)
+        Player(2,player_id=ID2,camera_id=CAM2)
         #Player(2, 1)
     
     def update(self):
@@ -208,7 +210,7 @@ class jintori(object):
                 self.item_time = 0
             if len(list(self.supports))==0: #supportが存在しないときにカウント     
                 self.item_time += 1
-                if self.item_time==60*ITEM_TIME:
+                if self.item_time==FPS*ITEM_TIME:
                     self.flag_item = True
     
     def draw_title(self):
@@ -255,7 +257,7 @@ class jintori(object):
                 (SCR_RECT.height-rest.get_height())/2)
         self.screen.blit(rest, rest_pos)
         self.loop += 1
-        if self.loop==60:
+        if self.loop==FPS:
             self.limite -= 1
             self.loop = 0
         if self.limite==0:
@@ -274,7 +276,7 @@ class jintori(object):
                 (SCR_RECT.height-rest.get_height())/2)
         self.screen.blit(rest, rest_pos)
         self.loop += 1
-        if self.loop==120:
+        if self.loop==2*FPS:
             self.loop = 0
             self.game_state = SCORE
             
@@ -300,7 +302,7 @@ class jintori(object):
         scores = score_font.render(
                 'Player1:{0} Player2:{1}'.format(score1, score2), False, (255,255,255))
         scores_pos = ((SCR_RECT.width-scores.get_width())/2, int(SCR_RECT.height*3/8))
-        if self.accum>=60:
+        if self.accum>=FPS:
             self.screen.blit(scores, scores_pos)
         #勝者判定
         winner_font = pygame.font.SysFont(None, 150)
@@ -314,16 +316,16 @@ class jintori(object):
         winner_pos = ((SCR_RECT.width-winner.get_width())/2, int(SCR_RECT.height/2))
         if not self.extra:
             self.score_bgm()
-        if self.accum>=120:
+        if self.accum>=2*FPS:
             self.screen.blit(winner, winner_pos)
             if self.extra:
                 self.extra_bgm()
-            if self.extra and self.accum>=255:
+            if self.extra and self.accum>=4.25*FPS:
                 extra_font = pygame.font.SysFont(None, 160)
                 extra = extra_font.render("EXTRA!!", False, (255,255,255))
                 extra_pos = ((SCR_RECT.width-extra.get_width())/2, int(SCR_RECT.height*2/3))
                 self.screen.blit(extra, extra_pos)
-                if self.accum>=340:
+                if self.accum>=5.7*FPS:
                     self.accum = 0
                     self.limite = 20
                     self.extra = False
@@ -378,7 +380,7 @@ class jintori(object):
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
                     #self.count_sound.play()
-                    #pygame.time.delay(1890)
+                    #pygame.time.delay(1230)
                     self.game_state = PLAY
                     self.bgm_play()
                 elif self.game_state==PLAY:
