@@ -222,6 +222,9 @@ class Player(pygame.sprite.Sprite):
         self.my_tile = 0
         self.gauge = 0
         self.sp_flag = 0 #ゲージたまったらフラグが立つ
+    
+    def release(self):
+        self.coord.release()
 
     #自分のタイルの数をカウントして保持
     def count_tiles(self):
