@@ -17,13 +17,13 @@ SCR_RECT = Rect(0, 0, 1024, 768)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
 TILE_H = int(SCR_RECT.bottom / 10)
-SPEED = int(1*TILE_W/60) #playerspeed
+SPEED = int(1*TILE_W/FPS)
 RELOAD = 17
 SUPP_LIFE = 8 #second サポートキャラの寿命
-SUPP_SPEED = int(3*TILE_W/60)#１秒でタイル
+SUPP_SPEED = int(3*TILE_W/FPS)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
-SHOT_SPEED = int(2*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
+SHOT_SPEED = int(2*TILE_W/FPS) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 2 #minute 制限時間 整数
 SP_POINT = 100 #ゲージがたまるタイル塗り数
 
