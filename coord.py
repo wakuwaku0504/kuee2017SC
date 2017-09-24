@@ -12,6 +12,8 @@ import numpy as np
 class Coordinates(object):
     def __init__(self, player_id, camera_id):
         self.cap = cv2.VideoCapture(camera_id)
+        if not self.cap.isOpened():
+            raise OSError("camera wasn't opened")
         self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
         #playerのid
         self.id = player_id
@@ -48,6 +50,7 @@ class Coordinates(object):
     
     def image(self):
         ret, frame = self.cap.read()
+        #print(ret)
         if not ret:
             return False
         
@@ -69,7 +72,7 @@ class Coordinates(object):
     
     
 if __name__=="__main__":
-    coo = Coordinates(player_id=0,camera_id=0)
+    coo = Coordinates(player_id=0,camera_id=2)
     
     while(1):
         coo.image()

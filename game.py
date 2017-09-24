@@ -15,7 +15,7 @@ from sprites import *
 from teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
-FPS = 30
+
 FULL = 0
 BGM = 1
 #チーム設定

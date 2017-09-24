@@ -12,6 +12,7 @@ import math
 from tools import *
 from coord import Coordinates
 
+FPS = 30
 SCR_RECT = Rect(0, 0, 1024, 768)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
@@ -218,7 +219,7 @@ class Player(pygame.sprite.Sprite):
         self.vx = random.choice((-self.speed,self.speed))
         self.vy = random.choice((-self.speed,self.speed))
         self.reload_timer = 10
-        self.supply_timer = self.supply_time*30
+        self.supply_timer = self.supply_time*FPS
         self.my_tile = 0
         self.gauge = 0
         self.sp_flag = 0 #ゲージたまったらフラグが立つ
@@ -283,11 +284,10 @@ class Player(pygame.sprite.Sprite):
                 Shot(self.rect.center, direction, self.flag)        
                 self.reload_timer = self.reload_time
         
-        elif self.supply_timer<=0:
-            if pressed_keys[K_F1] and self.flag==1:
-                self.supply_timer = 30*self.supply_time
-            elif pressed_keys[K_F2] and self.flag==2:
-                self.supply_timer = 30*self.supply_time
+        if pressed_keys[K_F1] and self.flag==1:
+            self.supply_timer = FPS*self.supply_time
+        elif pressed_keys[K_F2] and self.flag==2:
+            self.supply_timer = FPS*self.supply_time
         self.supply_timer -= 1
         
     def stick_mode_move(self):
@@ -340,59 +340,6 @@ class Player(pygame.sprite.Sprite):
                     Shot(self.rect.center, "right", self.flag)
                     self.reload_timer = self.reload_time
         
-       
-    
-    def keyboad_mode(self):
-        #押されているキーに応じてプレイヤーを移動
-        pressed_keys = pygame.key.get_pressed()
-        L = pressed_keys[K_LEFT]
-        R = pressed_keys[K_RIGHT]
-        U = pressed_keys[K_UP]
-        D = pressed_keys[K_DOWN]
-        
-        #special
-        if pressed_keys[K_j] and self.sp_flag :
-            self.special()
-
-        if L:
-            self.vx = -self.speed
-        elif not L and self.vx==-self.speed:
-            self.vx = 0
-        if R:
-            self.vx = self.speed
-        elif not R and self.vx==self.speed:
-            self.vx = 0
-        if U:
-            self.vy = -self.speed
-        elif not U and self.vy==-self.speed:
-            self.vy = 0
-        if D:
-            self.vy = self.speed
-        elif not D and self.vy==self.speed:
-            self.vy = 0
-        
-        #ミサイルの発射
-        if any([pressed_keys[m] for m in [K_a,K_d,K_w,K_s]]):
-            #リロード時間が0nになるまで再発射できない
-            if self.reload_timer > 0:
-                pass
-            else:
-                #発射
-                if pressed_keys[K_w]:
-                    Shot(self.rect.center, "up", self.flag)
-                    self.reload_timer = self.reload_time
-                elif pressed_keys[K_a]:
-                    Shot(self.rect.center, "left", self.flag)
-                    self.reload_timer = self.reload_time
-                elif pressed_keys[K_s]:
-                    Shot(self.rect.center, "down", self.flag)
-                    self.reload_timer = self.reload_time
-                elif pressed_keys[K_d]:
-                    Shot(self.rect.center, "right", self.flag)
-                    self.reload_timer = self.reload_time
-        
-        self.rect.move_ip(self.vx, self.vy)
-        self.rect.clamp_ip(SCR_RECT)
     
     #スペシャル攻撃
     def special(self):
@@ -407,6 +354,18 @@ class Player(pygame.sprite.Sprite):
             self.image = self.image1
         elif self.flag==2:
             self.image = self.image2
+    
+    def supply_bar(self):
+        #残弾
+        height = int((SCR_RECT.height*10/12)*self.supply_timer/(FPS*self.supply_time))
+        width = int(TILE_W/2)
+        pos = Rect(SCR_RECT.x, SCR_RECT.y, width, height)
+        pos.bottom = int(SCR_RECT.bottom*14/15)
+        if self.flag==1:
+            pos.right = int(SCR_RECT.width/30)
+        elif self.flag==2:
+            pos.left = int(SCR_RECT.width*29/30)
+        pygame.draw.rect(self.screen, (0,0,255), pos)
     
     def gauge_bar(self):
         #ゲージ
@@ -445,6 +404,7 @@ class Player(pygame.sprite.Sprite):
         self.gauge_bar()
     
     def update(self):
+        self.supply_bar()
         self.gauge_update()
         #self.keyboad_mode()
         self.camera_mode_move()

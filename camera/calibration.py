@@ -13,8 +13,8 @@ import cv2
 import tkinter as Tkinter
 from tkinter import messagebox as tkMessageBox #tkMessageBox
 
-square_side_length = 23.0 # チェスボード内の正方形の1辺のサイズ(mm)
-grid_intersection_size = (6, 4) # チェスボード内の格子数
+square_side_length = 19.0 # チェスボード内の正方形の1辺のサイズ(mm)
+grid_intersection_size = (11, 8) # チェスボード内の格子数
 
 pattern_points = np.zeros( (np.prod(grid_intersection_size), 3), np.float32 )
 pattern_points[:,:2] = np.indices(grid_intersection_size).T.reshape(-1, 2)
@@ -25,7 +25,7 @@ image_points = []
 root = Tkinter.Tk()
 root.withdraw()
 
-video_input = cv2.VideoCapture(1)
+video_input = cv2.VideoCapture(0)
 if (video_input.isOpened() == False):
     exit()
 
@@ -93,8 +93,8 @@ else:
         print("RMS = ", rms)
         print("K = \n", K)
         print("d = ", d.ravel())
-        np.savetxt("K.csv", K, delimiter =',',fmt="%0.14f") #カメラ行列の保存
-        np.savetxt("d.csv", d, delimiter =',',fmt="%0.14f") #歪み係数の保存
+        np.savetxt("calib_new/K.csv", K, delimiter =',',fmt="%0.14f") #カメラ行列の保存
+        np.savetxt("calib_new/d.csv", d, delimiter =',',fmt="%0.14f") #歪み係数の保存
 
         camera_mat = K
         dist_coef = d
