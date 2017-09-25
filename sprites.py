@@ -19,7 +19,7 @@ TILE_W = int(SCR_RECT.bottom / 10)
 TILE_H = int(SCR_RECT.bottom / 10)
 SPEED = int(1*TILE_W/FPS)
 RELOAD = 17
-SUPP_LIFE = 8 #second サポートキャラの寿命
+SUPP_LIFE = 5 #second サポートキャラの寿命
 SUPP_SPEED = int(3*TILE_W/FPS)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
@@ -206,13 +206,13 @@ class Player(pygame.sprite.Sprite):
         if self.flag==1:
             self.stick = self.stick1
             self.image = self.image1
-            self.rect = self.image.get_rect()
-            self.rect.center = (int(SCR_RECT.width/7),SCR_RECT.centery)
         elif self.flag==2:
             self.stick = self.stick2
             self.image = self.image2
-            self.rect = self.image.get_rect()
-            self.rect.center = (int(SCR_RECT.width*6/7),SCR_RECT.centery)
+            
+        self.rect = self.image.get_rect()
+        self.camera_mode_move()
+        
         #auto
         self.auto = auto
         self.auto_flag = 60*self.change_time
@@ -252,20 +252,6 @@ class Player(pygame.sprite.Sprite):
         else:
             pass
     
-    def auto_mode_move(self):
-    
-        self.rect.move_ip(self.vx, self.vy)
-        if self.rect.left < 0 or self.rect.right > SCR_RECT.width:
-            self.vx = -self.vx
-        if self.rect.top < 0 or self.rect.bottom > SCR_RECT.height:
-            self.vy = -self.vy
-        #self.auto_flag -= 1
-        #if self.auto_flag==0:
-        #    self.vx = random.choice((-self.speed,self.speed))
-        #    self.vy = random.choice((-self.speed,self.speed))
-        #    self.auto_flag = 60*self.change_time
-        #画面からはみ出ない
-        self.rect = self.rect.clamp(SCR_RECT)
         
     def auto_mode_shot(self):
         pressed_keys = pygame.key.get_pressed()
@@ -292,56 +278,8 @@ class Player(pygame.sprite.Sprite):
         if self.supply_timer<0:
             self.supply_timer = 0
         
-    def stick_mode_move(self):
-        #special
-        if self.stick.get_button(7) and self.sp_flag:
-            self.special()
-        #押されているキーに応じてプレイヤーを移動
-        if self.stick.get_button(15):
-            self.vx = -self.speed
-        elif not self.stick.get_button(15) and self.vx==-self.speed:
-            self.vx = 0
-        
-        if self.stick.get_button(13):
-            self.vx = self.speed
-        elif not self.stick.get_button(13) and self.vx==self.speed:
-            self.vx = 0
-        
-        if self.stick.get_button(12):
-            self.vy = -self.speed
-        elif not self.stick.get_button(12) and self.vy==-self.speed:
-            self.vy = 0
-        
-        if self.stick.get_button(14):
-            self.vy = self.speed
-        elif not self.stick.get_button(14) and self.vy==self.speed:
-            self.vy = 0
-        
-        self.rect.move_ip(self.vx, self.vy)
-        self.rect.clamp_ip(SCR_RECT)
     
-    def stick_mode_shot(self):
-        
-        #ミサイルの発射
-        if any([self.stick.get_button(m) for m in [0,1,2,3]]):
-            #リロード時間が0nになるまで再発射できない
-            if self.reload_timer > 0:
-                pass
-            else:
-                #発射
-                if self.stick.get_button(0):
-                    Shot(self.rect.center, "up", self.flag)
-                    self.reload_timer = self.reload_time
-                elif self.stick.get_button(3):
-                    Shot(self.rect.center, "left", self.flag)
-                    self.reload_timer = self.reload_time
-                elif self.stick.get_button(2):
-                    Shot(self.rect.center, "down", self.flag)
-                    self.reload_timer = self.reload_time
-                elif self.stick.get_button(1):
-                    Shot(self.rect.center, "right", self.flag)
-                    self.reload_timer = self.reload_time
-        
+    
     
     #スペシャル攻撃
     def special(self):

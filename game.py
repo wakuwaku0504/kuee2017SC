@@ -198,6 +198,9 @@ class jintori(object):
             self.bgm.update()
             self.P1, self.P2 = self.card.players(TEAMS)
             self.BGM = self.bgm.BGM
+        elif self.game_state==WAIT:
+            for player in self.players:
+                player.camera_mode_move()
         elif self.game_state==PLAY:
             #スプライトを更新
             self.all.update()
@@ -399,7 +402,7 @@ class jintori(object):
    
     def load_img(self):
         #背景イメージのロード
-        self.backImg = pygame.image.load("image/bg_veg.jpg").convert()
+        self.backImg = pygame.image.load("image/sky2.jpg").convert()
         #スプライトの画像を登録
         Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
         Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)

@@ -17,5 +17,5 @@ class Config(object):
 
 #gates = Config("gates.jpg","gates2.jpg","windows.jpg","microsoft.jpg")
 
-player1 = Config("plane_1.png", "plane_1.png", "tile_red.png", "red_turtle.png" )
-player2 = Config("plane_2.png", "plane_2.png", "tile_green.png", "green_turtle.png")
+player1 = Config("plane_pink.png", "plane_pink.png", "tile_pink.png", "Redshell.png" )
+player2 = Config("plane_green.png", "plane_green.png", "tile_green2.png", "green_turtle.png")

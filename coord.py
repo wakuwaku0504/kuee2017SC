@@ -29,8 +29,8 @@ class Coordinates(object):
         self.width = 640
         self.height = 480
         #この倍率でクロップする
-        self.crop_h = 0.9
-        self.crop_w = 0.95
+        self.crop_h = 0.85
+        self.crop_w = 0.9
         #新しい解像度
         self.width_c = int(self.width*self.crop_w)
         self.height_c = int(self.height*self.crop_h)
