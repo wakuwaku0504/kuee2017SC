@@ -13,8 +13,8 @@ import cv2
 import tkinter as Tkinter
 from tkinter import messagebox as tkMessageBox #tkMessageBox
 
-square_side_length = 19.0 # チェスボード内の正方形の1辺のサイズ(mm)
-grid_intersection_size = (11, 8) # チェスボード内の格子数
+square_side_length = 20.0 # チェスボード内の正方形の1辺のサイズ(mm)
+grid_intersection_size = (5, 3) # チェスボード内の格子数
 
 pattern_points = np.zeros( (np.prod(grid_intersection_size), 3), np.float32 )
 pattern_points[:,:2] = np.indices(grid_intersection_size).T.reshape(-1, 2)

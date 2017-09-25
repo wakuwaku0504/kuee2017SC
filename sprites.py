@@ -289,6 +289,8 @@ class Player(pygame.sprite.Sprite):
         elif pressed_keys[K_F2] and self.flag==2:
             self.supply_timer = FPS*self.supply_time
         self.supply_timer -= 1
+        if self.supply_timer<0:
+            self.supply_timer = 0
         
     def stick_mode_move(self):
         #special
@@ -420,7 +422,7 @@ class Shot(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos
         self.direct = direct
-        self.life_time = 60*self.life
+        self.life_time = FPS*self.life
         if flag==1:
             self.shots1.add(self)
         elif flag==2:

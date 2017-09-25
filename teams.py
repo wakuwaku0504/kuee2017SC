@@ -13,7 +13,9 @@ class Config(object):
         self.support = "image/{}".format(support)                
 
 #チーム設定
-jobs = Config("jobs.jpg","jobs2.jpg","mac.png","apple.png")
+#jobs = Config("jobs.jpg","jobs2.jpg","mac.png","apple.png")
 
-gates = Config("gates.jpg","gates2.jpg","windows.jpg","microsoft.jpg")
+#gates = Config("gates.jpg","gates2.jpg","windows.jpg","microsoft.jpg")
 
+player1 = Config("plane_1.png", "plane_1.png", "tile_red.png", "red_turtle.png" )
+player2 = Config("plane_2.png", "plane_2.png", "tile_green.png", "green_turtle.png")

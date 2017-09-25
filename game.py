@@ -16,17 +16,17 @@ from teams import *
 
 START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
-FULL = 0
-BGM = 1
+FULL = 1
+BGM = 0
 #チーム設定
-P1 = jobs
-P2 = gates
+P1 = player1
+P2 = player2
 
 ID1 = 0 #1pのid
 ID2 = 1 #2pのid
 CAM1 = 0
 CAM2 = 2
-TEAMS = [jobs, gates]
+TEAMS = [player1, player2]
 
 
 class jintori(object):
@@ -404,16 +404,16 @@ class jintori(object):
         Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
         Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
-        Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
-        Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H)
-        Player.image1 = load_image(self.P1.image, TILE_W*2, TILE_H*2)
-        Player.image2 = load_image(self.P2.image, TILE_W*2, TILE_H*2)
-        Player.sp_image1 = load_image(self.P1.sp_image, TILE_W*2, TILE_H*2)
-        Player.sp_image2 = load_image(self.P2.sp_image, TILE_W*2, TILE_H*2)
+        Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H, colorkey=-1)
+        Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H, colorkey=-1)
+        Player.image1 = load_image(self.P1.image, TILE_W*2, TILE_H*2, colorkey=-1)
+        Player.image2 = load_image(self.P2.image, TILE_W*2, TILE_H*2, colorkey=-1)
+        Player.sp_image1 = load_image(self.P1.sp_image, TILE_W*2, TILE_H*2, colorkey=-1)
+        Player.sp_image2 = load_image(self.P2.sp_image, TILE_W*2, TILE_H*2, colorkey=-1)
         Shot.image = load_image("image/bulletred.png", int(TILE_W/2), int(TILE_H/2), colorkey=-1)
         Item.image = load_image("image/box.png", TILE_W, TILE_H,colorkey=-1)
-        Support.image1 = load_image(self.P1.support, TILE_W, TILE_H)
-        Support.image2 = load_image(self.P2.support, TILE_W, TILE_H)
+        Support.image1 = load_image(self.P1.support, TILE_W, TILE_H, colorkey=-1)
+        Support.image2 = load_image(self.P2.support, TILE_W, TILE_H, colorkey=-1)
         
     def load_snd(self):
         #効果音ロード
