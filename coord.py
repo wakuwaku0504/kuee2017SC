@@ -70,7 +70,7 @@ class Coordinates(object):
         xy = self._get_xys(self.id, ids, corners)
         if xy is None:
             return False
-        return xy[0]/640, xy[1]/480
+        return xy[0]/self.width_c, xy[1]/self.height_c
     
     
     
