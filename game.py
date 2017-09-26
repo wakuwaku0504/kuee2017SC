@@ -22,7 +22,7 @@ BGM = 0
 P1 = player1
 P2 = player2
 
-ID1 = 0 #1pのid
+ID1 = 2 #1pのid
 ID2 = 1 #2pのid
 CAM1 = 0
 CAM2 = 2
@@ -121,6 +121,8 @@ class jintori(object):
         self.tile_rangey1 = range(self.SCR_CY, SCR_RECT.bottom-TILE_H, TILE_H)#真ん中から下
         self.tile_rangey2 = range(self.SCR_CY-TILE_H, TILE_H, -TILE_H)      #真ん中から上
     
+        
+        
     def init_tiles(self):
         #タイルを作成
         for i in self.tile_rangex1:
@@ -268,6 +270,11 @@ class jintori(object):
         if self.limite==0:
             self.game_state = GAME_SET
             pygame.mixer.music.fadeout(2*1000)
+        #bar image
+        self.screen.blit(self.support1_icon,self.supp1_rect)
+        self.screen.blit(self.support2_icon,self.supp2_rect)
+        self.screen.blit(self.tama1_icon,self.tama1_rect)
+        self.screen.blit(self.tama2_icon,self.tama2_rect)
             
     def draw_game_set(self):
         self.all.draw(self.screen)
@@ -403,6 +410,29 @@ class jintori(object):
     def load_img(self):
         #背景イメージのロード
         self.backImg = pygame.image.load("image/sky2.jpg").convert()
+        #barの下に表示する画像rect
+        self.support1_icon = load_image(
+                self.P1.support, int(TILE_W/2), int(TILE_H/2), colorkey=-1)
+        self.support2_icon = load_image(
+                self.P2.support, int(TILE_W/2), int(TILE_H/2), colorkey=-1)
+        self.tama1_icon = load_image(
+                "image/bulletred.png", int(TILE_W/2), int(TILE_H/2), colorkey=-1)
+        self.tama2_icon = self.tama1_icon
+        #rect取得
+        self.supp1_rect = self.support1_icon.get_rect()  
+        self.supp2_rect = self.support2_icon.get_rect()
+        self.tama1_rect = self.tama1_icon.get_rect()
+        self.tama2_rect = self.tama2_icon.get_rect()
+        #位置合わせ
+        self.supp1_rect.top = int(SCR_RECT.bottom*14/15)
+        self.supp1_rect.left = int(SCR_RECT.width/30)
+        self.supp2_rect.top = int(SCR_RECT.bottom*14/15)
+        self.supp2_rect.right = int(SCR_RECT.width*29/30)
+        self.tama1_rect.top = int(SCR_RECT.bottom*14/15)
+        self.tama1_rect.right = int(SCR_RECT.width/30)
+        self.tama2_rect.top = int(SCR_RECT.bottom*14/15)
+        self.tama2_rect.left = int(SCR_RECT.width*29/30)
+        
         #スプライトの画像を登録
         Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
         Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)

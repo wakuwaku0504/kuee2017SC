@@ -29,18 +29,18 @@ class Coordinates(object):
         self.width = 640
         self.height = 480
         #この倍率でクロップする
-        self.crop_h = 0.85
-        self.crop_w = 0.9
+        self.crop_h = 0.9
+        self.crop_w = 1
         #新しい解像度
         self.width_c = int(self.width*self.crop_w)
         self.height_c = int(self.height*self.crop_h)
-        w_bias = int((self.width - self.width_c)/2)
-        h_bias = int((self.height - self.height_c)/2)
+        self.w_bias = int((self.width - self.width_c)/2)
+        self.h_bias = int((self.height - self.height_c)/2)
         #imageの切り取るインデックス
-        self.w_start = w_bias
-        self.w_end = w_bias + self.width_c
-        self.h_start = h_bias
-        self.h_end = h_bias + self.height_c
+        self.w_start = self.w_bias
+        self.w_end = self.w_bias + self.width_c
+        self.h_start = self.h_bias
+        self.h_end = self.h_bias + self.height_c
     
     #imageの中央のある割合を切り取って返す
     def crop_image(self, image):
@@ -61,35 +61,35 @@ class Coordinates(object):
             return False
         
         undistort_image = cv2.undistort(frame, self.K, self.d)
-        cropped_image = self.crop_image(undistort_image)
+    
         #print(undistort_image.shape)
-        corners, ids, _ = aruco.detectMarkers(cropped_image, self.dictionary)
+        corners, ids, _ = aruco.detectMarkers(undistort_image, self.dictionary)
         if ids is None:
             return False
         
         xy = self._get_xys(self.id, ids, corners)
         if xy is None:
             return False
-        return xy[0]/self.width_c, xy[1]/self.height_c
+        return (xy[0]-self.w_bias)/self.width_c, (xy[1]-self.h_bias)/self.height_c
     
     
     
-    def image(self):
+    def image(self,dis):
         ret, frame = self.cap.read()
         #print(ret)
         if not ret:
             return False
         
         undistort_image = cv2.undistort(frame, self.K, self.d)
-        cropped_image = self.crop_image(undistort_image)
         #print(cropped_image.shape)
-        corners, ids, _ = aruco.detectMarkers(cropped_image, self.dictionary)
+        corners, ids, _ = aruco.detectMarkers(undistort_image, self.dictionary)
         if ids is None:
             return False
         
-        image = aruco.drawDetectedMarkers(cropped_image, corners, ids)
+        #cropped_image = self.crop_image(undistort_image)
+        image = aruco.drawDetectedMarkers(undistort_image, corners, ids)
         
-        cv2.imshow("camera", image)
+        cv2.imshow("camera{}".format(dis), image)
 
         
     def release(self):
@@ -98,10 +98,12 @@ class Coordinates(object):
     
     
 if __name__=="__main__":
-    coo = Coordinates(player_id=0,camera_id=0)
+    coo1 = Coordinates(player_id=1,camera_id=0)
+    #coo2 = Coordinates(player_id=3,camera_id=2)
     
     while(1):
-        coo.image()
+        coo1.image(0)
+        #coo2.image(2)
         #xy = coo.get()
         #if not xy==False:
         #    print(xy[0],xy[1])
@@ -113,5 +115,6 @@ if __name__=="__main__":
             break
     
     
-    coo.release()
+    coo1.release()
+    #coo2.release()
     cv2.destroyAllWindows()

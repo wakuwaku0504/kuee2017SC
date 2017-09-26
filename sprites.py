@@ -213,6 +213,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.camera_mode_move()
         
+        #bar_string
+        #tama_font = pygame.font.SysFont(None, 10)
+        #sp_font = pygame.font.SysFont(None, 10)        
+        #self.tama = tama_font.render("TAMA", False, (0,0,0))
+        #self.sp = sp_font.render("SP", False, (0,0,0))
+        
         #auto
         self.auto = auto
         self.auto_flag = 60*self.change_time
@@ -306,6 +312,7 @@ class Player(pygame.sprite.Sprite):
         elif self.flag==2:
             pos.left = int(SCR_RECT.width*29/30)
         pygame.draw.rect(self.screen, (0,0,255), pos)
+        
     
     def gauge_bar(self):
         #ゲージ
@@ -437,10 +444,6 @@ class Support(pygame.sprite.Sprite):
         self.rect.center = (x,y)
         self.vx = random.choice((-self.speed, self.speed))
         self.vy = random.choice((-self.speed, self.speed))
-        #self.vx = random.choice(range(-2*self.speed,2*self.speed+1))
-        #self.vy = random.choice(range(-2*self.speed,2*self.speed+1))
-        #self.tiles01 = tuple(self.tiles0) + tuple(self.tiles1)
-        #self.tiles02 = tuple(self.tiles0) + tuple(self.tiles2)
     
     #x方向衝突判定
     def collision_x(self):
