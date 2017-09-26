@@ -70,8 +70,10 @@ class Coordinates(object):
         xy = self._get_xys(self.id, ids, corners)
         if xy is None:
             return False
-        return (xy[0]-self.w_bias)/self.width_c, (xy[1]-self.h_bias)/self.height_c
-    
+        
+        x = (xy[0]-self.w_bias)/self.width_c
+        y = (xy[1]-self.h_bias)/self.height_c
+        return 1-x, 1-y
     
     
     def image(self,dis):

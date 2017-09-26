@@ -22,11 +22,11 @@ BGM = 0
 P1 = player1
 P2 = player2
 
-ID1 = 3 #1pのid
-ID2 = 4 #2pのid
+ID1 = 0 #1pのid
+ID2 = 0 #2pのid
 CAM1 = 0
 CAM2 = 2
-TEAMS = [player1, player2]
+TEAMS = [A, B, C, D]
 
 
 class jintori(object):
@@ -428,7 +428,7 @@ class jintori(object):
    
     def load_img(self):
         #背景イメージのロード
-        self.backImg = pygame.image.load("image/sky2.jpg").convert()
+        self.backImg = pygame.image.load("image/bg_space.jpg").convert()
         #barの下に表示する画像rect
         self.support1_icon = load_image(
                 self.P1.support, int(TILE_W/2), int(TILE_H/2), colorkey=-1)
