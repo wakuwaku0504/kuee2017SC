@@ -87,8 +87,6 @@ class Thumbnail(pygame.sprite.Sprite):
         #角度
         self.theta = 0
         
-            
-        
     
     def next_team(self):
         #active時
@@ -233,6 +231,13 @@ class Player(pygame.sprite.Sprite):
     
     def release(self):
         self.coord.release()
+        
+    def init_pos(self):
+        if self.flag==1:
+            self.rect.center = (int(SCR_RECT.width/7),SCR_RECT.centery)
+        elif self.flag==2:
+            self.rect.center = (int(SCR_RECT.width*6/7),SCR_RECT.centery)
+    
 
     #自分のタイルの数をカウントして保持
     def count_tiles(self):

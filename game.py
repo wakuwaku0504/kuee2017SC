@@ -14,7 +14,7 @@ from tools import *
 from sprites import *
 from teams import *
 
-START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
+START, WAIT, PRE, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5, 6) 
 
 FULL = 1
 BGM = 0
@@ -200,6 +200,7 @@ class jintori(object):
             self.bgm.update()
             self.P1, self.P2 = self.card.players(TEAMS)
             self.BGM = self.bgm.BGM
+            
         elif self.game_state==WAIT:
             for player in self.players:
                 player.camera_mode_move()
@@ -238,6 +239,18 @@ class jintori(object):
         self.bgm.draw()
     
     def draw_wait(self):
+        self.all.draw(self.screen)
+        m = int(self.limite / 60)
+        s = self.limite % 60
+        #時間描画
+        rest_font = pygame.font.SysFont(None, 80)
+        rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
+        rest_pos = (
+                (SCR_RECT.width-rest.get_width())/2,
+                (SCR_RECT.height-rest.get_height())/2)
+        self.screen.blit(rest, rest_pos)
+    
+    def draw_pre(self):
         self.all.draw(self.screen)
         m = int(self.limite / 60)
         s = self.limite % 60
@@ -361,6 +374,8 @@ class jintori(object):
             self.draw_config()
         elif self.game_state==WAIT:
             self.draw_wait()
+        elif self.game_state==PRE:
+            self.draw_pre()
         elif self.game_state==PLAY:
             self.draw_play()
         elif self.game_state==GAME_SET:
@@ -395,6 +410,10 @@ class jintori(object):
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
+                    for player in self.players:
+                        player.init_pos()
+                    self.game_state = PRE
+                elif self.game_state==PRE:
                     #self.count_sound.play()
                     #pygame.time.delay(1230)
                     self.game_state = PLAY
