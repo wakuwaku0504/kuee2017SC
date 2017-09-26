@@ -264,6 +264,20 @@ class Player(pygame.sprite.Sprite):
     
     def release(self):
         self.coord.release()
+    
+    #高さの判定
+    def judge_height(self, height):
+        if 1500<height<2800:
+            return True
+        else:
+            return False
+        
+    #フィールド内判定
+    def judge_field(self):
+        if 0<self.rect.centerx<SCR_RECT.width and 0<self.rect.centery<SCR_RECT.height:
+            return True
+        else:
+            return False
         
     def init_pos(self):
         if self.flag==1:
@@ -306,9 +320,8 @@ class Player(pygame.sprite.Sprite):
         elif pressed_keys[K_2] and self.flag==2:
             if self.sp_flag:
                 self.special()
-        #height = self.tcp.get_height()
-        #pos = self.rect.center
-        if self.supply_timer>0:
+        h = self.tcp.get_height()
+        if self.supply_timer>0 and self.judge_height(h) and self.judge_field():
             if self.reload_timer>0:
                 pass
             else:

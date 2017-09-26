@@ -26,6 +26,7 @@ def joystick(flag):
         print('Joystickが見つかりませんでした。')
         return False
 
+
 def resize(image, w, h):
     img = cv2.imread(image, cv2.IMREAD_COLOR)
     re_img = cv2.resize(img, (w,h))
@@ -103,19 +104,9 @@ def gene_item(tiles0, tiles1, tiles2):
     tile = random.choice(tiles)
     return tile.rect.centerx, tile.rect.centery
 
-#高さの判定
-#def judge_height(height):
-#    if 1500<height<2800:
-#        return True
-#    else:
-#        return False
+
     
-#フィールド内判定
-#def judge_field(pos):
-#    if 0<pos[0]<SCR_RECT.width and 0<pos[1]<SCR_RECT.height:
-#        return True
-#    else:
-#        return False
+
     
     
         
