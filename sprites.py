@@ -24,7 +24,7 @@ SUPP_SPEED = int(3*TILE_W/FPS)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
 SHOT_SPEED = int(2*TILE_W/FPS) #１秒でタイル三枚分で、１秒で死ぬ
-LIMITE = 2 #minute 制限時間 整数
+LIMITE = 5 #minute 制限時間 整数
 SP_POINT = 100 #ゲージがたまるタイル塗り数
 
 #スプライトではないが
