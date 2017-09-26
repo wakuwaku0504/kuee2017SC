@@ -55,7 +55,10 @@ class Connection(object):
             return False
         s_msg=b'10'
         self.clientsock.sendall(s_msg)
-        height = float(rcvmsg[0:10].decode("utf-8"))
+        try:
+            height = float(rcvmsg[0:10].decode("utf-8"))
+        except ValueError:
+            return False
         return height
 
 if __name__=="__main__":
@@ -261,7 +264,9 @@ class Player(pygame.sprite.Sprite):
         self.my_tile = 0
         self.gauge = 0
         self.sp_flag = 0 #ゲージたまったらフラグが立つ
-    
+        #ARマーカー
+        self.ar_flag = False
+        
     def release(self):
         self.coord.release()
     
@@ -278,6 +283,7 @@ class Player(pygame.sprite.Sprite):
             return True
         else:
             return False
+    
         
     def init_pos(self):
         if self.flag==1:
@@ -306,10 +312,11 @@ class Player(pygame.sprite.Sprite):
     def camera_mode_move(self):
         co = self.coord.get()
         if not co==False:
+            self.ar_flag = True
             self.rect.centerx = int(co[0]*SCR_RECT.width)
             self.rect.centery = int(co[1]*SCR_RECT.height)
         else:
-            pass
+            self.ar_flag = False
     
         
     def auto_mode_shot(self):
@@ -321,14 +328,15 @@ class Player(pygame.sprite.Sprite):
             if self.sp_flag:
                 self.special()
         h = self.tcp.get_height()
-        if self.supply_timer>0 and self.judge_height(h) and self.judge_field():
-            if self.reload_timer>0:
-                pass
-            else:
-                direction = random.choice(("up","down", "left", "right"))
-                Shot(self.rect.center, direction, self.flag)        
-                self.reload_timer = self.reload_time
-            self.supply_timer -= 1
+        if h:
+            if self.supply_timer>0 and self.judge_height(h) and self.judge_field() and self.ar_flag:
+                if self.reload_timer>0:
+                    pass
+                else:
+                    direction = random.choice(("up","down", "left", "right"))
+                    Shot(self.rect.center, direction, self.flag)        
+                    self.reload_timer = self.reload_time
+                self.supply_timer -= 1
         
         if pressed_keys[K_F1] and self.flag==1:
             self.supply_timer = FPS*self.supply_time
@@ -402,7 +410,6 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.supply_bar()
         self.gauge_update()
-        #self.keyboad_mode()
         self.camera_mode_move()
         self.auto_mode_shot()
         self.reload_timer -= 1
