@@ -23,7 +23,7 @@ P1 = player1
 P2 = player2
 
 ID1 = 2 #1pのid
-ID2 = 1 #2pのid
+ID2 = 4 #2pのid
 CAM1 = 0
 CAM2 = 2
 TEAMS = [player1, player2]
@@ -395,8 +395,8 @@ class jintori(object):
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
-                    self.count_sound.play()
-                    pygame.time.delay(1230)
+                    #self.count_sound.play()
+                    #pygame.time.delay(1230)
                     self.game_state = PLAY
                     self.bgm_play()
                 elif self.game_state==PLAY:

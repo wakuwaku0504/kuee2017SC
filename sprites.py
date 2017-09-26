@@ -13,6 +13,7 @@ from tools import *
 from coord import Coordinates
 
 FPS = 30
+SUPPLYTIME = 60
 SCR_RECT = Rect(0, 0, 1024, 768)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
@@ -25,7 +26,7 @@ ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
 SHOT_SPEED = int(2*TILE_W/FPS) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 5 #minute 制限時間 整数
-SP_POINT = 100 #ゲージがたまるタイル塗り数
+SP_POINT = 50 #ゲージがたまるタイル塗り数
 
 #スプライトではないが
 class Card(object):
@@ -196,7 +197,7 @@ class Player(pygame.sprite.Sprite):
     #自機
     speed = SPEED
     reload_time = RELOAD
-    supply_time = 30 #second弾補給まで
+    supply_time = SUPPLYTIME #second弾補給まで
     change_time = 5 #second 方向変わるタイミング
     def __init__(self, flag, player_id, camera_id, auto=False):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -261,14 +262,13 @@ class Player(pygame.sprite.Sprite):
         
     def auto_mode_shot(self):
         pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[K_1] and self.flag==1:
+            if self.sp_flag:
+                self.special()
+        elif pressed_keys[K_2] and self.flag==2:
+            if self.sp_flag:
+                self.special()
         if  self.supply_timer>0:
-            if pressed_keys[K_1] and self.flag==1:
-                if self.sp_flag:
-                    self.special()
-            elif pressed_keys[K_2] and self.flag==2:
-                if self.sp_flag:
-                    self.special()
-                
             if self.reload_timer>0:
                 pass
             else:
@@ -431,7 +431,7 @@ class Support(pygame.sprite.Sprite):
     #サポートキャラ
     #x,yは中心座標
     speed = SUPP_SPEED
-    life = 60*SUPP_LIFE
+    life = FPS*SUPP_LIFE
     def __init__(self, x, y, flag):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.flag = flag #１か２
