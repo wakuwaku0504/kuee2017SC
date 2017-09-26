@@ -22,7 +22,7 @@ BGM = 0
 P1 = player1
 P2 = player2
 
-ID1 = 2 #1pのid
+ID1 = 3 #1pのid
 ID2 = 4 #2pのid
 CAM1 = 0
 CAM2 = 2
