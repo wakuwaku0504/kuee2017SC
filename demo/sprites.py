@@ -18,7 +18,7 @@ TILE_H = int(SCR_RECT.bottom / 10)
 SPEED = int(1*TILE_W/60) #playerspeed
 RELOAD = 17
 SUPP_LIFE = 8 #second サポートキャラの寿命
-SUPP_SPEED = int(3*TILE_W/60)#１秒でタイル
+SUPP_SPEED = int(2*TILE_W/60)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
 SHOT_SPEED = int(3*TILE_W/60) #１秒でタイル三枚分で、１秒で死ぬ
@@ -266,24 +266,24 @@ class Player(pygame.sprite.Sprite):
         if self.stick.get_button(7) and self.sp_flag:
             self.special()
         #押されているキーに応じてプレイヤーを移動
-        if self.stick.get_button(15):
+        if self.stick.get_button(9):
             self.vx = -self.speed
-        elif not self.stick.get_button(15) and self.vx==-self.speed:
+        elif not self.stick.get_button(9) and self.vx==-self.speed:
             self.vx = 0
         
-        if self.stick.get_button(13):
+        if self.stick.get_button(8):
             self.vx = self.speed
-        elif not self.stick.get_button(13) and self.vx==self.speed:
+        elif not self.stick.get_button(8) and self.vx==self.speed:
             self.vx = 0
         
-        if self.stick.get_button(12):
+        if self.stick.get_button(7):
             self.vy = -self.speed
-        elif not self.stick.get_button(12) and self.vy==-self.speed:
+        elif not self.stick.get_button(7) and self.vy==-self.speed:
             self.vy = 0
         
-        if self.stick.get_button(14):
+        if self.stick.get_button(6):
             self.vy = self.speed
-        elif not self.stick.get_button(14) and self.vy==self.speed:
+        elif not self.stick.get_button(6) and self.vy==self.speed:
             self.vy = 0
         
         #ミサイルの発射
@@ -471,7 +471,7 @@ class Item(pygame.sprite.Sprite):
         self.born_sound.play()
 
     def generate(self, flag):
-        for i in range(2):
+        for i in range(1):
             Support(self.rect.centerx, self.rect.centery, flag)
         
     #playerに接触したかどうか

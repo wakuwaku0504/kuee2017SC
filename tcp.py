@@ -9,36 +9,54 @@ import sys
 import cv2
 import random
 from pygame.locals import *
-
 from tools import *
 from sprites import *
 from teams import *
+import socket
+import time
 
-START, WAIT, PRE, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5, 6) 
+START, WAIT, PLAY, GAME_SET, SCORE, CONFIG = (0, 1, 2, 3, 4, 5) 
 
-FULL = 0
-BGM = 0
+FULL = 1
 #チーム設定
-P1 = player1
-P2 = player2
+P1 = jobs
+P2 = gates
 
-ID1 = 0 #1pのid
-ID2 = 1 #2pのid
-CAM1 = 0
-CAM2 = 2
-TEAMS = [A, B, C, D]
+TEAMS = [jobs, gates, aphex]
 
+AUTO1 = 1 #1pをautoにするかどうか
+AUTO2 = 1
+
+class connection(object):
+    def __init__(self, port):
+        host = "localhost"
+        self.serversock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serversock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.serversock.bind((host, port))
+        self.serversock.listen(10)
+        print("Waiting for connection...")
+        self.clientsock, self.client_address = self.serversock.accept()
+        
+    def get_height(self):
+        #print('Waiting for message')
+        rcvmsg = self.clientsock.recv(1024)
+        print("Recieve -> %s" %(rcvmsg))
+        if rcvmsg == "":
+            return False
+        s_msg=b'10'
+        self.clientsock.sendall(s_msg)
 
 class jintori(object):
     def __init__(self):
-        self.tcp1 = Connection(6343)
-        self.tcp2 = Connection(6344)
-        self.stick1 = joystick(1)
+        
+        tcp1 = connection(6343)
+        #tcp2 = connection(6344)
+        self.stick1 = joystick(1) #joystick instance
         self.stick2 = joystick(2)
         #player割り当て
         self.P1 = P1
         self.P2 = P2
-        self.BGM = BGM
+        self.BGM = 0
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -59,14 +77,15 @@ class jintori(object):
         clock = pygame.time.Clock()
 
         while(1):
-            #self.tcp1.show_height()
-            #self.tcp2.show_height()
-            clock.tick(FPS) #40fps
+            clock.tick(60) #60fps
+            tcp1.get_height()
+            #tcp2.get_height()
             self.screen.blit(self.backImg,(0,0))
             self.update()
             self.draw( )
             pygame.display.update()
             self.key_handler()
+        tcp.clientsock.close() 
             
     def bgm_play(self):
         #BGM再生
@@ -104,7 +123,7 @@ class jintori(object):
         self.game_state = START
         #ゲーム残り時間
         self.limite = 60*LIMITE
-        #4０周するとたつ
+        #６０周するとたつ
         self.loop = 0
         #アイテム発生用
         self.flag_item = True
@@ -125,8 +144,6 @@ class jintori(object):
         self.tile_rangey1 = range(self.SCR_CY, SCR_RECT.bottom-TILE_H, TILE_H)#真ん中から下
         self.tile_rangey2 = range(self.SCR_CY-TILE_H, TILE_H, -TILE_H)      #真ん中から上
     
-        
-        
     def init_tiles(self):
         #タイルを作成
         for i in self.tile_rangex1:
@@ -191,9 +208,10 @@ class jintori(object):
         self.init_tiles()
         
         #自機を作成
-        Player(1,player_id=ID1,camera_id=CAM1,tcp=self.tcp1)
+        Player(1, auto=AUTO1)
+        #Player(1, 1)
         #敵機を作成
-        Player(2,player_id=ID2,camera_id=CAM2,tcp=self.tcp2)
+        Player(2, auto=AUTO2)
         #Player(2, 1)
     
     def update(self):
@@ -203,10 +221,6 @@ class jintori(object):
             self.bgm.update()
             self.P1, self.P2 = self.card.players(TEAMS)
             self.BGM = self.bgm.BGM
-            
-        elif self.game_state==WAIT:
-            for player in self.players:
-                player.camera_mode_move()
         elif self.game_state==PLAY:
             #スプライトを更新
             self.all.update()
@@ -221,7 +235,7 @@ class jintori(object):
                 self.item_time = 0
             if len(list(self.supports))==0: #supportが存在しないときにカウント     
                 self.item_time += 1
-                if self.item_time==FPS*ITEM_TIME:
+                if self.item_time==60*ITEM_TIME:
                     self.flag_item = True
     
     def draw_title(self):
@@ -253,18 +267,6 @@ class jintori(object):
                 (SCR_RECT.height-rest.get_height())/2)
         self.screen.blit(rest, rest_pos)
     
-    def draw_pre(self):
-        self.all.draw(self.screen)
-        m = int(self.limite / 60)
-        s = self.limite % 60
-        #時間描画
-        rest_font = pygame.font.SysFont(None, 80)
-        rest = rest_font.render('{0:02d}:{1:02d}'.format(m,s), False, (0,0,0))
-        rest_pos = (
-                (SCR_RECT.width-rest.get_width())/2,
-                (SCR_RECT.height-rest.get_height())/2)
-        self.screen.blit(rest, rest_pos)
-    
     def draw_play(self):
         self.all.draw(self.screen)
         m = int(self.limite / 60)
@@ -280,17 +282,12 @@ class jintori(object):
                 (SCR_RECT.height-rest.get_height())/2)
         self.screen.blit(rest, rest_pos)
         self.loop += 1
-        if self.loop==FPS:
+        if self.loop==60:
             self.limite -= 1
             self.loop = 0
         if self.limite==0:
             self.game_state = GAME_SET
             pygame.mixer.music.fadeout(2*1000)
-        #bar image
-        self.screen.blit(self.support1_icon,self.supp1_rect)
-        self.screen.blit(self.support2_icon,self.supp2_rect)
-        self.screen.blit(self.tama1_icon,self.tama1_rect)
-        self.screen.blit(self.tama2_icon,self.tama2_rect)
             
     def draw_game_set(self):
         self.all.draw(self.screen)
@@ -304,7 +301,7 @@ class jintori(object):
                 (SCR_RECT.height-rest.get_height())/2)
         self.screen.blit(rest, rest_pos)
         self.loop += 1
-        if self.loop==2*FPS:
+        if self.loop==120:
             self.loop = 0
             self.game_state = SCORE
             
@@ -330,7 +327,7 @@ class jintori(object):
         scores = score_font.render(
                 'Player1:{0} Player2:{1}'.format(score1, score2), False, (255,255,255))
         scores_pos = ((SCR_RECT.width-scores.get_width())/2, int(SCR_RECT.height*3/8))
-        if self.accum>=FPS:
+        if self.accum>=60:
             self.screen.blit(scores, scores_pos)
         #勝者判定
         winner_font = pygame.font.SysFont(None, 150)
@@ -344,16 +341,16 @@ class jintori(object):
         winner_pos = ((SCR_RECT.width-winner.get_width())/2, int(SCR_RECT.height/2))
         if not self.extra:
             self.score_bgm()
-        if self.accum>=2*FPS:
+        if self.accum>=120:
             self.screen.blit(winner, winner_pos)
             if self.extra:
                 self.extra_bgm()
-            if self.extra and self.accum>=4.25*FPS:
+            if self.extra and self.accum>=255:
                 extra_font = pygame.font.SysFont(None, 160)
                 extra = extra_font.render("EXTRA!!", False, (255,255,255))
                 extra_pos = ((SCR_RECT.width-extra.get_width())/2, int(SCR_RECT.height*2/3))
                 self.screen.blit(extra, extra_pos)
-                if self.accum>=5.7*FPS:
+                if self.accum>=340:
                     self.accum = 0
                     self.limite = 20
                     self.extra = False
@@ -377,8 +374,6 @@ class jintori(object):
             self.draw_config()
         elif self.game_state==WAIT:
             self.draw_wait()
-        elif self.game_state==PRE:
-            self.draw_pre()
         elif self.game_state==PLAY:
             self.draw_play()
         elif self.game_state==GAME_SET:
@@ -391,14 +386,10 @@ class jintori(object):
             if event.type==QUIT:
                 pygame.quit()
                 sys.exit()
-                for player in self.players:
-                    player.releas()
             elif event.type==KEYDOWN and event.key==K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-                for player in self.players:
-                    player.release()
-                
+
             elif event.type==KEYDOWN and event.key==K_c:
                 if self.game_state==START:
                     self.config_bgm()
@@ -413,12 +404,8 @@ class jintori(object):
                 if self.game_state==START: #スタート画面でスペースを押したとき
                     self.game_state = WAIT
                 elif self.game_state==WAIT:
-                    for player in self.players:
-                        player.init_pos()
-                    self.game_state = PRE
-                elif self.game_state==PRE:
-                    #self.count_sound.play()
-                    #pygame.time.delay(1230)
+                    self.count_sound.play()
+                    pygame.time.delay(1230)
                     self.game_state = PLAY
                     self.bgm_play()
                 elif self.game_state==PLAY:
@@ -432,43 +419,20 @@ class jintori(object):
     def load_img(self):
         #背景イメージのロード
         self.backImg = pygame.image.load("image/bg_veg.jpg").convert()
-        #barの下に表示する画像rect
-        self.support1_icon = load_image(
-                self.P1.support, int(TILE_W/2), int(TILE_H/2), colorkey=-1)
-        self.support2_icon = load_image(
-                self.P2.support, int(TILE_W/2), int(TILE_H/2), colorkey=-1)
-        self.tama1_icon = load_image(
-                "image/bulletred.png", int(TILE_W/2), int(TILE_H/2), colorkey=-1)
-        self.tama2_icon = self.tama1_icon
-        #rect取得
-        self.supp1_rect = self.support1_icon.get_rect()  
-        self.supp2_rect = self.support2_icon.get_rect()
-        self.tama1_rect = self.tama1_icon.get_rect()
-        self.tama2_rect = self.tama2_icon.get_rect()
-        #位置合わせ
-        self.supp1_rect.top = int(SCR_RECT.bottom*14/15)
-        self.supp1_rect.left = int(SCR_RECT.width/30)
-        self.supp2_rect.top = int(SCR_RECT.bottom*14/15)
-        self.supp2_rect.right = int(SCR_RECT.width*29/30)
-        self.tama1_rect.top = int(SCR_RECT.bottom*14/15)
-        self.tama1_rect.right = int(SCR_RECT.width/30)
-        self.tama2_rect.top = int(SCR_RECT.bottom*14/15)
-        self.tama2_rect.left = int(SCR_RECT.width*29/30)
-        
         #スプライトの画像を登録
         Bgm.image = load_image("image/penguin.png", int(TILE_W*1.4), int(TILE_H*2.2), colorkey=-1)
         Bgm.image1 = load_image("image/onpu.png",TILE_W, TILE_H, colorkey=-1)
         Tile.image = load_image("image/kuro.jpg", TILE_W, TILE_H, colorkey=-1)
-        Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H, colorkey=-1)
-        Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H, colorkey=-1)
-        Player.image1 = load_image(self.P1.image, TILE_W*2, TILE_H*2, colorkey=-1)
-        Player.image2 = load_image(self.P2.image, TILE_W*2, TILE_H*2, colorkey=-1)
-        Player.sp_image1 = load_image(self.P1.sp_image, TILE_W*2, TILE_H*2, colorkey=-1)
-        Player.sp_image2 = load_image(self.P2.sp_image, TILE_W*2, TILE_H*2, colorkey=-1)
+        Tile.image1 = load_image(self.P1.tile, TILE_W, TILE_H)
+        Tile.image2 = load_image(self.P2.tile, TILE_W, TILE_H)
+        Player.image1 = load_image(self.P1.image, TILE_W*2, TILE_H*2)
+        Player.image2 = load_image(self.P2.image, TILE_W*2, TILE_H*2)
+        Player.sp_image1 = load_image(self.P1.sp_image, TILE_W*2, TILE_H*2)
+        Player.sp_image2 = load_image(self.P2.sp_image, TILE_W*2, TILE_H*2)
         Shot.image = load_image("image/bulletred.png", int(TILE_W/2), int(TILE_H/2), colorkey=-1)
         Item.image = load_image("image/box.png", TILE_W, TILE_H,colorkey=-1)
-        Support.image1 = load_image(self.P1.support, TILE_W, TILE_H, colorkey=-1)
-        Support.image2 = load_image(self.P2.support, TILE_W, TILE_H, colorkey=-1)
+        Support.image1 = load_image(self.P1.support, TILE_W, TILE_H)
+        Support.image2 = load_image(self.P2.support, TILE_W, TILE_H)
         
     def load_snd(self):
         #効果音ロード

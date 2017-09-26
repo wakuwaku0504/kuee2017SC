@@ -22,8 +22,8 @@ P2 = gates
 
 TEAMS = [jobs, gates, aphex]
 
-AUTO1 = 1 #1pをautoにするかどうか
-AUTO2 = 1
+AUTO1 = 0 #1pをautoにするかどうか
+AUTO2 = 0
 
 class jintori(object):
     def __init__(self):
@@ -42,7 +42,7 @@ class jintori(object):
         pygame.display.set_caption("Demo")
     
         #イメージを用意
-        #サムネ
+        #サムネc
         self.teams_thumb = [load_image(m.image, 3*TILE_W, 3*TILE_H) for m in TEAMS]
         self.load_img()
         #サウンドを用意

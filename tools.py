@@ -7,6 +7,7 @@ Created on Thu Sep  7 09:05:59 2017
 
 import pygame
 from pygame.locals import *
+from sprites import SCR_RECT 
 import sys
 import cv2
 import numpy as np
@@ -102,4 +103,19 @@ def gene_item(tiles0, tiles1, tiles2):
     tile = random.choice(tiles)
     return tile.rect.centerx, tile.rect.centery
 
+#高さの判定
+#def judge_height(height):
+#    if 1500<height<2800:
+#        return True
+#    else:
+#        return False
+    
+#フィールド内判定
+#def judge_field(pos):
+#    if 0<pos[0]<SCR_RECT.width and 0<pos[1]<SCR_RECT.height:
+#        return True
+#    else:
+#        return False
+    
+    
         

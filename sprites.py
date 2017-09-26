@@ -9,6 +9,7 @@ from pygame.locals import *
 import sys
 import random
 import math
+import socket
 from tools import *
 from coord import Coordinates
 
@@ -21,13 +22,53 @@ TILE_H = int(SCR_RECT.bottom / 10)
 SPEED = int(1*TILE_W/FPS)
 RELOAD = 17
 SUPP_LIFE = 5 #second サポートキャラの寿命
-SUPP_SPEED = int(3*TILE_W/FPS)#１秒でタイル
+SUPP_SPEED = int(2*TILE_W/FPS)#１秒でタイル
 ITEM_TIME = 5 #アイテムの復活時間
 SHOT_LIFE = 1 #second
 SHOT_SPEED = int(2*TILE_W/FPS) #１秒でタイル三枚分で、１秒で死ぬ
 LIMITE = 5 #minute 制限時間 整数
 SP_POINT = 50 #ゲージがたまるタイル塗り数
 
+class Connection(object):
+    def __init__(self, port):
+        self.port = port
+        host = "localhost"
+        self.serversock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serversock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.serversock.bind((host, port))
+        self.serversock.listen(10)
+        print("Waiting for connection...")
+        self.clientsock, self.client_address = self.serversock.accept()
+        
+    def show_height(self):
+        #print('Waiting for message')
+        rcvmsg = self.clientsock.recv(1024)
+        print("Recieve from %s -> %s" %(self.port, rcvmsg[0:10]))
+        if rcvmsg == "":
+            return False
+        s_msg=b'10'
+        self.clientsock.sendall(s_msg)
+        
+    def get_height(self):
+        rcvmsg = self.clientsock.recv(1024)
+        if rcvmsg == "":
+            return False
+        s_msg=b'10'
+        self.clientsock.sendall(s_msg)
+        height = float(rcvmsg[0:10].decode("utf-8"))
+        return height
+
+if __name__=="__main__":
+    tcp1 = Connection(6343)
+    tcp2 = Connection(6344)
+    while(1):
+        height1 = tcp1.get_height()
+        height2 = tcp2.get_height()
+        print(height1, type(height1))
+        print(height2, type(height2))
+        
+        
+    
 #スプライトではないが
 class Card(object):
     def __init__(self, thumb1, thumb2, screen, teams):
@@ -197,11 +238,13 @@ class Player(pygame.sprite.Sprite):
     reload_time = RELOAD
     supply_time = SUPPLYTIME #second弾補給まで
     change_time = 5 #second 方向変わるタイミング
-    def __init__(self, flag, player_id, camera_id, auto=False):
+    def __init__(self, flag, player_id, camera_id, tcp):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.flag = flag
         #カメラから座標取得
         self.coord = Coordinates(player_id, camera_id)
+        #tcp
+        self.tcp = tcp
         if self.flag==1:
             self.stick = self.stick1
             self.image = self.image1
@@ -211,18 +254,8 @@ class Player(pygame.sprite.Sprite):
             
         self.rect = self.image.get_rect()
         self.camera_mode_move()
+
         
-        #bar_string
-        #tama_font = pygame.font.SysFont(None, 10)
-        #sp_font = pygame.font.SysFont(None, 10)        
-        #self.tama = tama_font.render("TAMA", False, (0,0,0))
-        #self.sp = sp_font.render("SP", False, (0,0,0))
-        
-        #auto
-        self.auto = auto
-        self.auto_flag = 60*self.change_time
-        self.vx = random.choice((-self.speed,self.speed))
-        self.vy = random.choice((-self.speed,self.speed))
         self.reload_timer = 10
         self.supply_timer = self.supply_time*FPS
         self.my_tile = 0
@@ -273,24 +306,22 @@ class Player(pygame.sprite.Sprite):
         elif pressed_keys[K_2] and self.flag==2:
             if self.sp_flag:
                 self.special()
-        if  self.supply_timer>0:
+        #height = self.tcp.get_height()
+        #pos = self.rect.center
+        if self.supply_timer>0:
             if self.reload_timer>0:
                 pass
             else:
                 direction = random.choice(("up","down", "left", "right"))
                 Shot(self.rect.center, direction, self.flag)        
                 self.reload_timer = self.reload_time
+            self.supply_timer -= 1
         
         if pressed_keys[K_F1] and self.flag==1:
             self.supply_timer = FPS*self.supply_time
         elif pressed_keys[K_F2] and self.flag==2:
             self.supply_timer = FPS*self.supply_time
-        self.supply_timer -= 1
-        if self.supply_timer<0:
-            self.supply_timer = 0
         
-    
-    
     
     #スペシャル攻撃
     def special(self):
@@ -411,7 +442,7 @@ class Item(pygame.sprite.Sprite):
         self.born_sound.play()
 
     def generate(self, flag):
-        for i in range(2):
+        for i in range(1):
             Support(self.rect.centerx, self.rect.centery, flag)
         
     #playerに接触したかどうか
