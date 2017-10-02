@@ -4,23 +4,19 @@ This README would normally document whatever steps are necessary to get your app
 
 ### What is this repository for? ###
 
-* 2017年度京都大学電気電子工学科サマーキャンプ用プログラム
-	魚眼カメラ二つを用いてARマーカーの空間座標を計算するクラスと
-	それを反映させる陣取りゲームのプログラムを保管
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
+* 2017年度京都大学電気電子工学科サマーキャンプ用プログラム(3回生)
 
 ### How do I get set up? ###
 
 * Summary of set up
 * Configuration
 * Dependencies
-	Python3.6
-	OpenCV
-	pygame
+Python3.6　　
+OpenCV　　
+pygame　　
 * Database configuration
 * How to run tests
+
 * Deployment instructions
 
 ### Contribution guidelines ###
