@@ -10,13 +10,12 @@ This README would normally document whatever steps are necessary to get your app
 
 * Summary of set up
 * Configuration
-* Dependencies
+* Dependencies  
 Python3.6  
 OpenCV  
 pygame  
+* How to run tests  
 
-* Database configuration
-* How to run tests
 
 * Deployment instructions
 
