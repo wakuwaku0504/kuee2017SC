@@ -20,10 +20,10 @@ FULL = 1
 P1 = jobs
 P2 = gates
 
-TEAMS = [jobs, gates, aphex]
+TEAMS = [jobs, gates, aphex, saki, nodoka, A, B, C, D]
 
-AUTO1 = 0 #1pをautoにするかどうか
-AUTO2 = 0
+AUTO1 = 1 #1pをautoにするかどうか
+AUTO2 = 1
 
 class jintori(object):
     def __init__(self):
@@ -32,7 +32,7 @@ class jintori(object):
         #player割り当て
         self.P1 = P1
         self.P2 = P2
-        self.BGM = 0
+        self.BGM = 1
         pygame.init()
         pygame.mixer.init()
         if FULL:
@@ -155,10 +155,11 @@ class jintori(object):
         self.shots2 = pygame.sprite.Group()
         self.supports = pygame.sprite.Group()
     
-        Player.containers = self.all, self.players
-        Shot.containers = self.all
+        
         Tile.containers = self.all, self.tiles0
         Item.containers = self.all, self.supports
+        Player.containers = self.all, self.players
+        Shot.containers = self.all
         Support.containers = self.all, self.supports
         
         Bgm.screen = self.screen

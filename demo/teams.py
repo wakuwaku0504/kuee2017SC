@@ -22,5 +22,8 @@ saki = Config("saki.jpg", "saki2.jpg", "hai.jpg", "nodoka.jpg")
 nodoka = Config("nodo.jpg", "nodo2.jpg", "isou.jpg", "etopen.jpg")
 
 aphex = Config("Aphex.jpg", "Aphex2.jpg", "aphex_tile.png", "aphex_sup.jpg")
-
+A = Config("A/plane.JPG","A/plane.JPG","A/tile.jpg","A/support.png")
+B = Config("B/plane.jpg","B/plane.jpg","B/tile.jpg","B/support.jpg")
+C = Config("C/plane.png","C/plane.png","C/tile.png","C/support.png")
+D = Config("D/plane.jpg","D/plane.jpg","D/tile.jpg","D/support2.png")
 shibuya_kun = Config("keigo.jpg", "keigo2.jpg", "head.jpg", "point.jpg")

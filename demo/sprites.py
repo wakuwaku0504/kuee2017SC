@@ -11,7 +11,7 @@ import random
 import math
 from tools import *
 
-SCR_RECT = Rect(0, 0, 1024, 768)#(1280,720),(1920,1080)
+SCR_RECT = Rect(0, 0, 1920, 1080)#(1280,720),(1920,1080)
 #SCR_RECT = Rect(0, 0, 640, 480)
 TILE_W = int(SCR_RECT.bottom / 10) 
 TILE_H = int(SCR_RECT.bottom / 10)
