@@ -146,7 +146,7 @@ class jintori(object):
         self.bgm = Bgm(self.BGM) 
         
         #スプライトグループを作成して登録
-        self.all = pygame.sprite.RenderUpdates()
+        self.all = pygame.sprite.OrderedUpdates()
         self.players = pygame.sprite.Group()
         self.tiles0 = pygame.sprite.Group() #中立タイルグループ
         self.tiles1 = pygame.sprite.Group() #1側タイル
